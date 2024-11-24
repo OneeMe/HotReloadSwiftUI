@@ -39,4 +39,4 @@ Here is all the features we want to implement:
 - [ ] Host App Life Cycle Sync
   - [ ] Scene Phase
   - [ ] App State
-
+- [ ] Conditional Package Import (Import Foo into Example and switch between Network Client and Native Client)
