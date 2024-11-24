@@ -5,13 +5,13 @@
 import DynamicSwiftUITransferProtocol
 import Foundation
 
-public protocol App {
+public protocol DynamicApp {
     associatedtype Body: Scene
     @MainActor var body: Self.Body { get }
     init()
 }
 
-public extension App {
+public extension DynamicApp {
     @MainActor
     static func main() {
         let app = Self()
@@ -20,7 +20,7 @@ public extension App {
 }
 
 @MainActor
-func runApp<Root: App>(_ app: Root) {
+func runApp<Root: DynamicApp>(_ app: Root) {
     let scene = app.body
     
     let viewHierarchy = processScene(app.body)

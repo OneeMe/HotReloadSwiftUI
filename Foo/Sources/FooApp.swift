@@ -4,7 +4,7 @@
 import DynamicSwiftUI
 
 @main 
-struct Foo: App {
+struct Foo: DynamicApp {
     var body: some Scene {
         WindowGroup {
             ContentView()
