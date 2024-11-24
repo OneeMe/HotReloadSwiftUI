@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:DynamicSwiftUI}/Foo",
+      "name": "Debug Foo (Foo)",
+      "program": "${workspaceFolder:DynamicSwiftUI}/Foo/.build/debug/Foo",
+      "preLaunchTask": "swift: Build Debug Foo (Foo)"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:DynamicSwiftUI}/Foo",
+      "name": "Release Foo (Foo)",
+      "program": "${workspaceFolder:DynamicSwiftUI}/Foo/.build/release/Foo",
+      "preLaunchTask": "swift: Build Release Foo (Foo)"
+    }
+  ]
+}
