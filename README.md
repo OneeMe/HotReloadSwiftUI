@@ -13,6 +13,16 @@ You should first run the Example. Then you can run the Foo project.
 
 After running the Foo project, you can see the "Hello, This is from Foo~~~" text in the Example project.
 
+## Architecture
+
+```
+Example -> DynamicSwiftUIRunner -> SwiftUI(Maybe UIKit in the future)
+              /\ HTTP Request with JSON
+              |
+              |
+Foo -> DynamicSwiftUI
+```
+
 ## Features
 
 Here is all the features we want to implement:
