@@ -3,7 +3,7 @@
 
 import Foundation
 
-public struct JsonData: Codable {
+public struct RenderData: Codable, Sendable {
     public let tree: Node
     
     public init(tree: Node) {
@@ -11,19 +11,32 @@ public struct JsonData: Codable {
     }
 }
 
-public struct Node: Codable {
-    public enum NodeType: String, Codable {
+public struct Node: Codable, Sendable {
+    public enum NodeType: String, Codable, Sendable {
         case text
         case container
+        case button
     }
     
+    public let id: String
     public let type: NodeType
-    public let data: String
+    public let data: [String: String]
     public let children: [Node]?
     
-    public init(type: NodeType, data: String, children: [Node]? = nil) {
+    public init(id: String, type: NodeType, data: [String: String], children: [Node]? = nil) {
+        self.id = id
         self.type = type
         self.data = data
         self.children = children
     }
 }
+
+public struct InteractiveData: Codable, Sendable {
+    public enum InteractiveType: String, Codable, Sendable {
+        case tap
+    }
+    
+    public let id: String
+    public let type: InteractiveType
+}
+    

@@ -3,8 +3,8 @@
 // Created by: onee on 2024/11/24
 //
 
-import Foundation
 import DynamicSwiftUITransferProtocol
+import Foundation
 
 actor WebSocketClient {
     var isConnected = false
@@ -34,16 +34,19 @@ actor WebSocketClient {
             switch message {
             case .string(let text):
                 print("Received message: \(text)")
+                if let data = text.data(using: .utf8),
+                   let interactiveData = try? JSONDecoder().decode(InteractiveData.self, from: data)
+                {
+                    handleInteraction(interactiveData)
+                }
             case .data(let data):
                 print("Received data: \(data)")
             @unknown default:
                 break
             }
-            // 继续接收下一条消息
             receiveMessage()
         case .failure(let error):
             print("WebSocket receive error: \(error)")
-            // 尝试重新连接
             Task {
                 try await Task.sleep(nanoseconds: 1_000_000_000)
                 setup()
@@ -51,13 +54,30 @@ actor WebSocketClient {
         }
     }
     
-    func send(_ data: JsonData) async {
+    private func handleInteraction(_ data: InteractiveData) {
+        switch data.type {
+        case .tap:
+            // 找到对应的按钮并触发动作
+            Task { @MainActor in
+                if let button = ComponentRegistry.shared.getComponent(withId: data.id) {
+                    if let button = button as? Button {
+                        Task { @MainActor in
+                            button.handleTap()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func send(_ data: RenderData) async {
         if !isConnected {
             setup()
         }
         
         guard let jsonData = try? JSONEncoder().encode(data),
-              let jsonString = String(data: jsonData, encoding: .utf8) else {
+              let jsonString = String(data: jsonData, encoding: .utf8)
+        else {
             return
         }
         
@@ -74,39 +94,20 @@ actor WebSocketClient {
     }
 }
 
-private let webSocketClient = WebSocketClient()
+let webSocketClient = WebSocketClient()
 
-@MainActor
-func runApp<Root: App>(_ app: Root) {
-    let viewHierarchy = processScene(app.body)
-    let jsonData = JsonData(tree: viewHierarchy)
-    
-    Task {
-        await webSocketClient.send(jsonData)
-    }
-    
-    print("Application started, entering run loop...")
-    
-    DispatchQueue.main.async {
-        let timer = Timer(timeInterval: TimeInterval.infinity, repeats: true) { _ in }
-        RunLoop.current.add(timer, forMode: .common)
-    }
-    
-    RunLoop.main.run()
-}
-
-private func processScene<S: Scene>(_ scene: S) -> Node {
+@MainActor func processScene<S: Scene>(_ scene: S) -> Node {
     print("scene type is \(type(of: scene))")
     if let windowGroup = scene as? WindowGroup {
         return processView(windowGroup.content)
     }
-    return Node(type: .container, data: "unknown")
+    return Node(id: "", type: .container, data: [:])
 }
 
-private func processView<V: View>(_ view: V) -> Node {
+@MainActor func processView<V: View>(_ view: V) -> Node {
     print("will process view \(type(of: view))")
-    if let text = view as? Text {
-        return Node(type: .text, data: text.content)
+    if let convertible = view as? ViewConvertible {
+        return convertible.convertToNode()
     }
     return processView(view.body)
 }

@@ -11,9 +11,3 @@ struct Foo: App {
         }
     }
 }
-
-struct ContentView: View {
-    var body: some View {
-        Text("Hello, This is from Foo~~~")
-    }
-}

@@ -3,7 +3,12 @@
 // Created by: onee on 2024/11/24
 //
 
+import DynamicSwiftUITransferProtocol
+import Foundation
+
+@MainActor
 public struct Text: View {
+    let id: String = UUID().uuidString
     let content: String
 
     public init(_ content: String) {
@@ -14,10 +19,7 @@ public struct Text: View {
 }
 
 extension Text: ViewConvertible {
-    func convertToNode() -> [String: Any] {
-        return [
-            "type": "text",
-            "data": content
-        ]
+    nonisolated func convertToNode() -> Node {
+        return Node(id: id, type: .text, data: ["text": content])
     }
 }
