@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import DynamicSwiftUITransferProtocol
 
 actor WebSocketClient {
     var isConnected = false
@@ -50,11 +51,12 @@ actor WebSocketClient {
         }
     }
     
-    func send(_ data: [String: Any]) async {
+    func send(_ data: JsonData) async {
         if !isConnected {
             setup()
         }
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: data),
+        
+        guard let jsonData = try? JSONEncoder().encode(data),
               let jsonString = String(data: jsonData, encoding: .utf8) else {
             return
         }
@@ -77,10 +79,10 @@ private let webSocketClient = WebSocketClient()
 @MainActor
 func runApp<Root: App>(_ app: Root) {
     let viewHierarchy = processScene(app.body)
-    let message = ["tree": viewHierarchy]
-
+    let jsonData = JsonData(tree: viewHierarchy)
+    
     Task {
-        await webSocketClient.send(message)
+        await webSocketClient.send(jsonData)
     }
     
     print("Application started, entering run loop...")
@@ -93,18 +95,18 @@ func runApp<Root: App>(_ app: Root) {
     RunLoop.main.run()
 }
 
-private func processScene<S: Scene>(_ scene: S) -> [String: Any] {
+private func processScene<S: Scene>(_ scene: S) -> Node {
     print("scene type is \(type(of: scene))")
     if let windowGroup = scene as? WindowGroup {
         return processView(windowGroup.content)
     }
-    return ["type": "unknown"]
+    return Node(type: .container, data: "unknown")
 }
 
-private func processView<V: View>(_ view: V) -> [String: Any] {
+private func processView<V: View>(_ view: V) -> Node {
     print("will process view \(type(of: view))")
-    if let convertible = view as? ViewConvertible {
-        return convertible.convertToNode()
+    if let text = view as? Text {
+        return Node(type: .text, data: text.content)
     }
     return processView(view.body)
 }

@@ -13,13 +13,15 @@ let package = Package(
             targets: ["DynamicSwiftUIRunner"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/httpswift/swifter.git", .upToNextMajor(from: "1.5.0"))
+        .package(url: "https://github.com/httpswift/swifter.git", .upToNextMajor(from: "1.5.0")),
+        .package(path: "../DynamicSwiftUITransferProtocol")
     ],
     targets: [
         .target(
             name: "DynamicSwiftUIRunner",
             dependencies: [
                 .product(name: "Swifter", package: "swifter"),
+                .product(name: "DynamicSwiftUITransferProtocol", package: "DynamicSwiftUITransferProtocol")
             ]),
         .testTarget(
             name: "DynamicSwiftUIRunnerTests",

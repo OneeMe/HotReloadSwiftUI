@@ -4,6 +4,7 @@ import Foundation
 import Swifter
 import SwiftUI
 import Combine
+import DynamicSwiftUITransferProtocol
 
 class ServerState: ObservableObject {
     @Published var data: JsonData?
@@ -13,7 +14,6 @@ class ServerState: ObservableObject {
     init(id: String) {
         server = LocalServer()
         
-        // 订阅服务器的数据流
         server.dataPublisher
             .compactMap { jsonString -> JsonData? in
                 guard let data = jsonString.data(using: .utf8),
@@ -41,11 +41,24 @@ public struct DynamicSwiftUIRunner: View {
     public var body: some View {
         Group {
             if let node = state.data?.tree {
-                switch node.type {
-                case .text:
-                    Text(node.data)
-                case .container:
-                    EmptyView()
+                buildView(from: node)
+            } else {
+                EmptyView()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func buildView(from node: Node) -> some View {
+        switch node.type {
+        case .text:
+            Text(node.data)
+        case .container:
+            if let children = node.children {
+                VStack {
+                    ForEach(Array(children.enumerated()), id: \.offset) { _, child in
+                        buildView(from: child)
+                    }
                 }
             } else {
                 EmptyView()
@@ -67,7 +80,6 @@ private class LocalServer {
     }
     
     private func setupServer() {
-        // 设置 WebSocket 路由
         server["/ws"] = websocket(
             text: { [weak self] (session, text) in
                 print("Received WebSocket message: \(text)")
@@ -95,20 +107,5 @@ private class LocalServer {
     deinit {
         server.stop()
     }
-}
-
-struct JsonData: Decodable {
-    let tree: Node
-}
-
-struct Node: Decodable {
-    enum NodeType: String, Decodable {
-        case text
-        case container
-    }
-    
-    let type: NodeType
-    let data: String
-    let children: [Node]?
 }
     
