@@ -29,13 +29,11 @@ Here is all the features we want to implement:
 
 - [x] Render Foo SwiftUI View to Host
   - [x] Text
-  - [ ] Button
+  - [x] Button
   - [ ] Image
   - [ ] VStack
   - [ ] HStack
-- [ ] Host Gesture response to Foo
-  - [ ] Tap
-  - [ ] Long Press
+- [x] Host Gesture response to Foo
 - [ ] Host App Life Cycle Sync
   - [ ] Scene Phase
   - [ ] App State
