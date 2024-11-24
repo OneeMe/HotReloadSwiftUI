@@ -23,6 +23,25 @@ When you first run the Example project, you will see the basic UI:
 |-----------------------------------------------|
 |<img style="width:300px" src="https://github.com/user-attachments/assets/3f359cf5-168a-4d97-9c9a-bb475d1d180f"></img>|
 
+This UI is rendered by the native SwiftUI, the code is like this:
+
+```swift
+import DynamicSwiftUIRunner
+
+struct ContentView: View {
+    var body: some View {
+        VStack {
+            Image(systemName: "globe")
+                .imageScale(.large)
+                .foregroundStyle(.tint)
+            Text("Hello, world!")
+            DynamicSwiftUIRunner(id: "Foo")
+        }
+        .padding()
+    }
+}
+```
+
 After you run the Foo project, you will see the Button just the same like the button in Foo project:
 
 ```swift
