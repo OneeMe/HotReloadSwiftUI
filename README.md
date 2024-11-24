@@ -17,9 +17,11 @@ After running the Foo project, you can see the "Hello, This is from Foo~~~" text
 
 ```
 Example -> DynamicSwiftUIRunner -> SwiftUI(Maybe UIKit in the future)
-              /\ HTTP Request with JSON
+              /\ 
               |
+              | WebSocket request
               |
+              \/
 Foo -> DynamicSwiftUI
 ```
 
