@@ -13,6 +13,7 @@ You should first run the Example. Then you can run the Foo project.
 The Foo project will use websocket to connect to the Example project.
 
 > Note
+> 
 > Currently, the same Swift Package can not be opened in different Xcode project. 
 > So if you open the Foo and Example in xcode in the same time, the later one will fail to build.
 
