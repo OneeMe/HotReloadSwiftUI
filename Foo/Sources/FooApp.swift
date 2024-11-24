@@ -14,6 +14,6 @@ struct Foo: App {
 
 struct ContentView: View {
     var body: some View {
-        Text("Hello, Hello, Hello!")
+        Text("Hello, This is from Foo~~~")
     }
 }
