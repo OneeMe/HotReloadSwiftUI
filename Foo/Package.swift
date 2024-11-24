@@ -7,6 +7,7 @@ let package = Package(
     name: "Foo",
     platforms: [
         .macOS(.v15),
+        .iOS(.v15),
     ],
     dependencies: [
         .package(name: "DynamicSwiftUI", path: "../DynamicSwiftUI"),
