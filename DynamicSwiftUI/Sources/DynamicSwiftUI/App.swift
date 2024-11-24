@@ -10,6 +10,7 @@ public protocol App {
 }
 
 public extension App {
+    @MainActor
     static func main() {
         let app = Self()
         runApp(app)

@@ -18,6 +18,7 @@ class ServerState: ObservableObject {
             .compactMap { jsonString -> JsonData? in
                 guard let data = jsonString.data(using: .utf8),
                       let jsonData = try? JSONDecoder().decode(JsonData.self, from: data) else {
+                    print("Failed to decode JSON: \(jsonString)")
                     return nil
                 }
                 return jsonData
@@ -54,33 +55,38 @@ public struct DynamicSwiftUIRunner: View {
 }
 
 private class LocalServer {
-    private let server: HttpServer
+    private let server = HttpServer()
     private let dataSubject = PassthroughSubject<String, Never>()
     
-    // 公开的数据流
     var dataPublisher: AnyPublisher<String, Never> {
         dataSubject.eraseToAnyPublisher()
     }
     
     init() {
-        self.server = HttpServer()
         setupServer()
     }
     
     private func setupServer() {
-        server.POST["/update"] = { [weak self] request in
-            let body = request.body
-            if let jsonString = String(bytes: body, encoding: .utf8) {
-                DispatchQueue.main.async {
-                    self?.dataSubject.send(jsonString)
-                }
+        // 设置 WebSocket 路由
+        server["/ws"] = websocket(
+            text: { [weak self] (session, text) in
+                print("Received WebSocket message: \(text)")
+                self?.dataSubject.send(text)
+            },
+            binary: { (session, binary) in
+                print("Received binary data")
+            },
+            connected: { session in
+                print("WebSocket client connected")
+            },
+            disconnected: { session in
+                print("WebSocket client disconnected")
             }
-            return .ok(.text("received"))
-        }
+        )
         
         do {
             try server.start(8080)
-            print("Server started successfully on port 8080")
+            print("WebSocket server started successfully on ws://localhost:8080/ws")
         } catch {
             print("Server start error: \(error)")
         }
@@ -100,7 +106,7 @@ struct Node: Decodable {
         case text
         case container
     }
-
+    
     let type: NodeType
     let data: String
     let children: [Node]?
