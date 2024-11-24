@@ -99,6 +99,7 @@ let webSocketClient = WebSocketClient()
 @MainActor func processScene<S: Scene>(_ scene: S) -> Node {
     print("scene type is \(type(of: scene))")
     if let windowGroup = scene as? WindowGroup {
+        ViewHierarchyManager.shared.setCurrentView(windowGroup.content)
         return processView(windowGroup.content)
     }
     return Node(id: "", type: .container, data: [:])

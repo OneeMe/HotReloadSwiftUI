@@ -1,27 +1,28 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
+import Combine
+import DynamicSwiftUITransferProtocol
 import Foundation
 import Swifter
 import SwiftUI
-import Combine
-import DynamicSwiftUITransferProtocol
 
 class ServerState: ObservableObject {
-    @Published var data: JsonData?
+    @Published var data: RenderData?
     private let server: LocalServer
     private var cancellables = Set<AnyCancellable>()
     
-    init(id: String) {
-        server = LocalServer()
+    init(id: String, server: LocalServer) {
+        self.server = server
         
         server.dataPublisher
-            .compactMap { jsonString -> JsonData? in
+            .compactMap { jsonString -> RenderData? in
                 guard let data = jsonString.data(using: .utf8),
-                      let jsonData = try? JSONDecoder().decode(JsonData.self, from: data) else {
+                      let renderData = try? JSONDecoder().decode(RenderData.self, from: data)
+                else {
                     print("Failed to decode JSON: \(jsonString)")
                     return nil
                 }
-                return jsonData
+                return renderData
             }
             .receive(on: DispatchQueue.main)
             .assign(to: \.data, on: self)
@@ -32,10 +33,13 @@ class ServerState: ObservableObject {
 public struct DynamicSwiftUIRunner: View {
     let id: String
     @StateObject private var state: ServerState
+    private let server: LocalServer
     
     public init(id: String) {
         self.id = id
-        _state = StateObject(wrappedValue: ServerState(id: id))
+        let server = LocalServer()
+        _state = StateObject(wrappedValue: ServerState(id: id, server: server))
+        self.server = server
     }
     
     public var body: some View {
@@ -52,24 +56,27 @@ public struct DynamicSwiftUIRunner: View {
     private func buildView(from node: Node) -> some View {
         switch node.type {
         case .text:
-            Text(node.data)
+            AnyView(Text(node.data["text"] ?? ""))
+        case .button:
+            Button(node.data["title"] ?? "") {
+                let interactiveData = InteractiveData(id: node.id, type: .tap)
+                Task {
+                    await server.send(interactiveData)
+                }
+            }
         case .container:
             if let children = node.children {
-                VStack {
-                    ForEach(Array(children.enumerated()), id: \.offset) { _, child in
-                        buildView(from: child)
-                    }
-                }
-            } else {
+                // TODO: Implement container view
                 EmptyView()
             }
         }
     }
 }
 
-private class LocalServer {
+class LocalServer {
     private let server = HttpServer()
     private let dataSubject = PassthroughSubject<String, Never>()
+    private var sessions: Set<WebSocketSession> = []
     
     var dataPublisher: AnyPublisher<String, Never> {
         dataSubject.eraseToAnyPublisher()
@@ -81,18 +88,20 @@ private class LocalServer {
     
     private func setupServer() {
         server["/ws"] = websocket(
-            text: { [weak self] (session, text) in
+            text: { [weak self] _, text in
                 print("Received WebSocket message: \(text)")
                 self?.dataSubject.send(text)
             },
-            binary: { (session, binary) in
+            binary: { _, _ in
                 print("Received binary data")
             },
-            connected: { session in
+            connected: { [weak self] session in
                 print("WebSocket client connected")
+                self?.sessions.insert(session)
             },
-            disconnected: { session in
+            disconnected: { [weak self] session in
                 print("WebSocket client disconnected")
+                self?.sessions.remove(session)
             }
         )
         
@@ -101,6 +110,18 @@ private class LocalServer {
             print("WebSocket server started successfully on ws://localhost:8080/ws")
         } catch {
             print("Server start error: \(error)")
+        }
+    }
+    
+    func send(_ data: InteractiveData) async {
+        guard let jsonData = try? JSONEncoder().encode(data),
+              let jsonString = String(data: jsonData, encoding: .utf8)
+        else {
+            return
+        }
+        
+        sessions.forEach { session in
+            session.writeText(jsonString)
         }
     }
     

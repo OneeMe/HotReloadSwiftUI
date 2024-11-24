@@ -35,7 +35,7 @@ final class ComponentRegistry {
     private init() {}
     
     func register(_ component: any ViewConvertible, withId id: String) {
-        components[id] = component
+        components.updateValue(component, forKey: id)
     }
     
     func getComponent(withId id: String) -> (any ViewConvertible)? {

@@ -22,12 +22,6 @@ public extension App {
 @MainActor
 func runApp<Root: App>(_ app: Root) {
     let scene = app.body
-    if let windowGroup = scene as? WindowGroup {
-        // 保存当前视图用于后续更新
-        Task {
-            await ViewHierarchyManager.shared.setCurrentView(windowGroup.content)
-        }
-    }
     
     let viewHierarchy = processScene(app.body)
     let renderData = RenderData(tree: viewHierarchy)

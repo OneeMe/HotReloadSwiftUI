@@ -38,5 +38,10 @@ public struct InteractiveData: Codable, Sendable {
     
     public let id: String
     public let type: InteractiveType
+    
+    public init(id: String, type: InteractiveType) {
+        self.id = id
+        self.type = type
+    }
 }
     
