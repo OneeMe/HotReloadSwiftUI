@@ -1,6 +1,6 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
-
+/// DynamicSwiftUITransferProtocol
+/// Created by: onee on 2024/11/24
+/// 
 import Foundation
 
 public struct RenderData: Codable, Sendable {

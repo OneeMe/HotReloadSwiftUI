@@ -1,3 +1,8 @@
+/// Node.swift
+/// DynamicSwiftUI
+/// Created by: onee on 2024/11/24
+/// 
+
 import Foundation
 import DynamicSwiftUITransferProtocol
 
@@ -26,10 +31,10 @@ public struct State<Value> {
     }
 }
 
-// 组件注册表
+// 组件注册表，保持可交互的组件，方便获取组件信息
 @MainActor
-final class ComponentRegistry {
-    static let shared = ComponentRegistry()
+final class InteractiveComponentRegistry {
+    static let shared = InteractiveComponentRegistry()
     private var components: [String: any ViewConvertible] = [:]
     
     private init() {}
@@ -79,8 +84,8 @@ final class ViewHierarchyManager {
     
     func setCurrentView(_ view: any View) {
         self.currentView = view
-        // 清除旧的组件注册
-        ComponentRegistry.shared.clear()
+        // 清除旧的交互组件注册表
+        InteractiveComponentRegistry.shared.clear()
     }
     
     func getCurrentViewHierarchy() -> Node {

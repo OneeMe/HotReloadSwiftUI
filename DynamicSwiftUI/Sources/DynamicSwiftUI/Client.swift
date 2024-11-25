@@ -59,7 +59,7 @@ actor WebSocketClient {
         case .tap:
             // 找到对应的按钮并触发动作
             Task { @MainActor in
-                if let button = ComponentRegistry.shared.getComponent(withId: data.id) {
+                if let button = InteractiveComponentRegistry.shared.getComponent(withId: data.id) {
                     if let button = button as? Button {
                         Task { @MainActor in
                             button.handleTap()

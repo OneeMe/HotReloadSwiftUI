@@ -16,7 +16,7 @@ public struct Button: View {
         self.id = UUID().uuidString
         self.title = title
         self.action = action
-        ComponentRegistry.shared.register(self, withId: id)
+        InteractiveComponentRegistry.shared.register(self, withId: id)
     }
     
     public var body: some View {
