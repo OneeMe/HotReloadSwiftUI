@@ -54,7 +54,7 @@ public struct DynamicSwiftUIRunner: View {
             if let node = state.data?.tree {
                 buildView(from: node)
             } else {
-                AnyView(self.content.body)
+                AnyView(self.content)
             }
         }
     }
