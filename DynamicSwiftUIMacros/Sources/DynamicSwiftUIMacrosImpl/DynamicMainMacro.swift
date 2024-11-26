@@ -1,12 +1,7 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftSyntaxBuilder
-
-@attached(peer)
-public macro DynamicMain(_ name: String) = #externalMacro(
-    module: "DynamicSwiftUIMacros",
-    type: "DynamicMainMacro"
-)
+import SwiftCompilerPlugin
 
 public struct DynamicMainMacro: PeerMacro {
     public static func expansion(
@@ -22,16 +17,20 @@ public struct DynamicMainMacro: PeerMacro {
             throw CustomError.message("@DynamicMain requires a string literal argument and must be applied to a struct")
         }
         
+        // 生成一个静态初始化器来自动注册
         return ["""
-        @_cdecl("__load_\(raw: stringLiteral)_dynamic_app")
-        private func __load_dynamic_app() {
-            DynamicAppRegistry.register(name: \"\(raw: stringLiteral)\", type: \(raw: structDecl.name.text).self)
+        private enum Registration {
+            static let token: Void = {
+                DynamicAppRegistry.register(
+                    name: "\(raw: stringLiteral)",
+                    type: \(raw: structDecl.name.text).self
+                )
+                return ()
+            }()
         }
         
-        private let __register_token: Void = {
-            __load_dynamic_app()
-            return ()
-        }()
+        // 确保在加载时执行注册
+        private let _registration = Registration.token
         """]
     }
 }
@@ -41,10 +40,8 @@ enum CustomError: Error {
 }
 
 @main
-public struct DynamicSwiftUIMacrosPlugin: CompilerPlugin {
-    public init() {}
-    
-    public var providingMacros: [Macro.Type] {
-        [DynamicMainMacro.self]
-    }
+struct DynamicSwiftUIMacrosPlugin: CompilerPlugin {
+    let providingMacros: [Macro.Type] = [
+        DynamicMainMacro.self
+    ]
 } 

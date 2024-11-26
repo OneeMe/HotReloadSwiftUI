@@ -41,3 +41,20 @@ func runApp<Root: DynamicApp>(_ app: Root) {
     
     RunLoop.main.run()
 }
+
+public enum DynamicAppRegistry {
+    nonisolated(unsafe) private static var apps: [String: any DynamicApp.Type] = [:]
+    
+    public static func register(name: String, type: any DynamicApp.Type) {
+        apps[name] = type
+    }
+    
+    public static func getApp(name: String) -> (any DynamicApp.Type)? {
+        return apps[name]
+    }
+    
+    public static func createApp(name: String) -> (any DynamicApp)? {
+        guard let appType = apps[name] else { return nil }
+        return (appType.init() as? any DynamicApp)
+    }
+} 

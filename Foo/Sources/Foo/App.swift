@@ -3,8 +3,10 @@
 // Created by: onee on 2024/11/24
 //
 import DynamicSwiftUI
+import Foundation
 
-@DynamicMain("Foo")
+// TODO: impl dynamic register
+//@DynamicMain("Foo")
 public struct App: DynamicApp {
     // TODO: hide this
     public init() {}
