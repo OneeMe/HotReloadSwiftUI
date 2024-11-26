@@ -4,7 +4,7 @@
 //
 import DynamicSwiftUI
 
-// TODO: add @DynamicMain to find out the entry of the package
+@DynamicMain("Foo")
 public struct App: DynamicApp {
     // TODO: hide this
     public init() {}

@@ -17,6 +17,24 @@
       "name": "Release Foo",
       "program": "${workspaceFolder:Foo}/.build/release/Foo",
       "preLaunchTask": "swift: Build Release Foo"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:Foo}",
+      "name": "Debug FooApp",
+      "program": "${workspaceFolder:Foo}/.build/debug/FooApp",
+      "preLaunchTask": "swift: Build Debug FooApp"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:Foo}",
+      "name": "Release FooApp",
+      "program": "${workspaceFolder:Foo}/.build/release/FooApp",
+      "preLaunchTask": "swift: Build Release FooApp"
     }
   ]
 }
