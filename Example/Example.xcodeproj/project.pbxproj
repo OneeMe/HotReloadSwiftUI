@@ -7,10 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BDDF9AAD2CF5AD5B00AB2D7A /* Foo in Frameworks */ = {isa = PBXBuildFile; productRef = BDDF9AAC2CF5AD5B00AB2D7A /* Foo */; };
-		BDDF9C072CF5E2BD00AB2D7A /* Foo in Frameworks */ = {isa = PBXBuildFile; productRef = BDDF9C062CF5E2BD00AB2D7A /* Foo */; };
-		BDE8AFE22CF275AC00DCC746 /* DynamicSwiftUIRunner in Frameworks */ = {isa = PBXBuildFile; productRef = BDE8AFE12CF275AC00DCC746 /* DynamicSwiftUIRunner */; };
-		BDE8B07C2CF34BFF00DCC746 /* DynamicSwiftUIRunner in Frameworks */ = {isa = PBXBuildFile; productRef = BDE8B07B2CF34BFF00DCC746 /* DynamicSwiftUIRunner */; };
+		BD6FBED72CF6003F009C6EF1 /* Foo in Frameworks */ = {isa = PBXBuildFile; productRef = BD6FBED62CF6003F009C6EF1 /* Foo */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,10 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BDDF9AAD2CF5AD5B00AB2D7A /* Foo in Frameworks */,
-				BDE8B07C2CF34BFF00DCC746 /* DynamicSwiftUIRunner in Frameworks */,
-				BDE8AFE22CF275AC00DCC746 /* DynamicSwiftUIRunner in Frameworks */,
-				BDDF9C072CF5E2BD00AB2D7A /* Foo in Frameworks */,
+				BD6FBED72CF6003F009C6EF1 /* Foo in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +121,9 @@
 				BDE8B07B2CF34BFF00DCC746 /* DynamicSwiftUIRunner */,
 				BDDF9AAC2CF5AD5B00AB2D7A /* Foo */,
 				BDDF9C062CF5E2BD00AB2D7A /* Foo */,
+				BD6FBE9D2CF5FEB5009C6EF1 /* FooWrapper */,
+				BD6FBEC02CF5FFCC009C6EF1 /* Foo */,
+				BD6FBED62CF6003F009C6EF1 /* Foo */,
 			);
 			productName = Example;
 			productReference = BDE8AFB22CF2756300DCC746 /* Example.app */;
@@ -211,8 +208,7 @@
 			mainGroup = BDE8AFA92CF2756300DCC746;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				BDE8B07A2CF34BFF00DCC746 /* XCLocalSwiftPackageReference "../DynamicSwiftUIRunner" */,
-				BDDF9C052CF5E2BD00AB2D7A /* XCLocalSwiftPackageReference "../Foo" */,
+				BD6FBED52CF6003F009C6EF1 /* XCLocalSwiftPackageReference "../Foo" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BDE8AFB32CF2756300DCC746 /* Products */;
@@ -612,17 +608,25 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		BDDF9C052CF5E2BD00AB2D7A /* XCLocalSwiftPackageReference "../Foo" */ = {
+		BD6FBED52CF6003F009C6EF1 /* XCLocalSwiftPackageReference "../Foo" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../Foo;
-		};
-		BDE8B07A2CF34BFF00DCC746 /* XCLocalSwiftPackageReference "../DynamicSwiftUIRunner" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../DynamicSwiftUIRunner;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		BD6FBE9D2CF5FEB5009C6EF1 /* FooWrapper */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FooWrapper;
+		};
+		BD6FBEC02CF5FFCC009C6EF1 /* Foo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Foo;
+		};
+		BD6FBED62CF6003F009C6EF1 /* Foo */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Foo;
+		};
 		BDDF9AAC2CF5AD5B00AB2D7A /* Foo */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Foo;

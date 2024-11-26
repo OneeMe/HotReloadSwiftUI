@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "DynamicSwiftUITransferProtocol",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v14),
         .iOS(.v13)
     ],
     products: [

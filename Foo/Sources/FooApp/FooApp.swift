@@ -2,11 +2,11 @@
 // https://docs.swift.org/swift-book
 
 import DynamicSwiftUI
-import Foo
+import FooContent
 
 @main 
 struct FooApp: App {
     var body: some Scene {
-        Foo.FooApp().body
+        FooContent.FooApp().body
     }
 }

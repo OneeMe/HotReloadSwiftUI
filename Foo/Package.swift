@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "Foo",
     platforms: [
-        .macOS(.v15),
+        .macOS(.v14),
         .iOS(.v15),
     ],
     products: [
@@ -14,20 +14,23 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "DynamicSwiftUI", path: "../DynamicSwiftUI"),
+        .package(name: "DynamicSwiftUIRunner", path: "../DynamicSwiftUIRunner"),
     ],
     targets: [
         .executableTarget(
             name: "FooApp",
             dependencies: ["Foo", "DynamicSwiftUI"],
-            path: "Sources/FooApp",
             swiftSettings: [
                 .define("ENABLE_DYNAMIC_SWIFTUI")
             ]
         ),
         .target(
-            name: "Foo", 
-            dependencies: ["DynamicSwiftUI"], 
-            path: "Sources/Foo",
+            name: "Foo",
+            dependencies: ["DynamicSwiftUIRunner", "FooContent"]
+        ),
+        .target(
+            name: "FooContent",
+            dependencies: ["DynamicSwiftUI"],
             swiftSettings: [
                 // TODO: 这种条件判断可能不是最好的，看看有没有更好的判断条件
                 .define("ENABLE_DYNAMIC_SWIFTUI", .when(platforms: [.macOS]))

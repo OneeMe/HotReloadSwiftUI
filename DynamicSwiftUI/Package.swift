@@ -6,8 +6,8 @@ import PackageDescription
 let package = Package(
     name: "DynamicSwiftUI",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v13)
+        .macOS(.v14),
+        .iOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -24,7 +24,7 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "DynamicSwiftUI",
-            dependencies: ["DynamicSwiftUITransferProtocol", "DynamicSwiftUIMacros"]),
+            dependencies: ["DynamicSwiftUITransferProtocol"]),
         .testTarget(
             name: "DynamicSwiftUITests",
             dependencies: ["DynamicSwiftUI"]

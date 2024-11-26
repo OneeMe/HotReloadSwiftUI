@@ -11,9 +11,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Text("This is text from Native SwiftUI")
-            Group {
-                DynamicSwiftUIRunner(id: "Foo", content: Foo.ContentView())
-            }
+            FooContentView()
         }
         .padding()
     }

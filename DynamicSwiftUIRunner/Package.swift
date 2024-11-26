@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "DynamicSwiftUIRunner",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v14),
         .iOS(.v15)
     ],
     products: [
