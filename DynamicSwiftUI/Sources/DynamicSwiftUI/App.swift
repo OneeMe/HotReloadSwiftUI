@@ -7,13 +7,13 @@ import Foundation
 
 @_exported import DynamicSwiftUIMacros
 
-public protocol DynamicApp {
+public protocol App {
     associatedtype Body: Scene
     @MainActor var body: Self.Body { get }
     init()
 }
 
-public extension DynamicApp {
+public extension App {
     @MainActor
     static func main() {
         let app = Self()
@@ -22,7 +22,7 @@ public extension DynamicApp {
 }
 
 @MainActor
-func runApp<Root: DynamicApp>(_ app: Root) {
+func runApp<Root: App>(_ app: Root) {
     let scene = app.body
     
     let viewHierarchy = processScene(app.body)
@@ -43,18 +43,18 @@ func runApp<Root: DynamicApp>(_ app: Root) {
 }
 
 public enum DynamicAppRegistry {
-    nonisolated(unsafe) private static var apps: [String: any DynamicApp.Type] = [:]
+    nonisolated(unsafe) private static var apps: [String: any App.Type] = [:]
     
-    public static func register(name: String, type: any DynamicApp.Type) {
+    public static func register(name: String, type: any App.Type) {
         apps[name] = type
     }
     
-    public static func getApp(name: String) -> (any DynamicApp.Type)? {
+    public static func getApp(name: String) -> (any App.Type)? {
         return apps[name]
     }
     
-    public static func createApp(name: String) -> (any DynamicApp)? {
+    public static func createApp(name: String) -> (any App)? {
         guard let appType = apps[name] else { return nil }
-        return (appType.init() as? any DynamicApp)
+        return (appType.init() as? any App)
     }
 } 

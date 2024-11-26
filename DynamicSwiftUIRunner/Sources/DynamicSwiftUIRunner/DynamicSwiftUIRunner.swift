@@ -32,13 +32,16 @@ class RenderState: ObservableObject {
 
 public struct DynamicSwiftUIRunner: View {
     let id: String
+    let content: any View
     #if DEBUG
     @StateObject private var state: RenderState
     private let server: LocalServer
     #endif
     
-    public init(id: String) {
+    public init(id: String, content: any View) {
         self.id = id
+        // TODO: use id and dynamic register to match the App struct
+        self.content = content
         #if DEBUG
         let server = LocalServer()
         _state = StateObject(wrappedValue: RenderState(id: id, server: server))
@@ -51,7 +54,7 @@ public struct DynamicSwiftUIRunner: View {
             if let node = state.data?.tree {
                 buildView(from: node)
             } else {
-                EmptyView()
+                AnyView(self.content.body)
             }
         }
     }

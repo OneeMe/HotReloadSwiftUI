@@ -2,13 +2,20 @@
 // Foo
 // Created by: onee on 2024/11/24
 //
+#if ENABLE_DYNAMIC_SWIFTUI
 import DynamicSwiftUI
+#else
+import SwiftUI
+#endif
 
-struct ContentView: View {
+public struct ContentView: View {
     @State var count = 0
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         Button("Button From Foo: count: \(count)") {
+            print("count is \(count)")
             count += 1
         }
     }

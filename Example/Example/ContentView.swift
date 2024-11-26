@@ -5,6 +5,7 @@
 
 import DynamicSwiftUIRunner
 import SwiftUI
+import Foo
 
 struct ContentView: View {
     var body: some View {
@@ -13,7 +14,7 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
-            DynamicSwiftUIRunner(id: "Foo")
+            DynamicSwiftUIRunner(id: "Foo", content: Foo.ContentView())
         }
         .padding()
     }

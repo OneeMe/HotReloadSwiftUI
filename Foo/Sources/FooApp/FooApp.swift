@@ -5,8 +5,8 @@ import DynamicSwiftUI
 import Foo
 
 @main 
-struct FooApp: DynamicApp {
+struct FooApp: App {
     var body: some Scene {
-        App().body
+        Foo.FooApp().body
     }
 }

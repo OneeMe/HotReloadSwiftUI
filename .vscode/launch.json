@@ -35,6 +35,24 @@
       "name": "Release DynamicSwiftUIMacrosClient (DynamicSwiftUIMacros)",
       "program": "${workspaceFolder:DynamicSwiftUI}/DynamicSwiftUIMacros/.build/release/DynamicSwiftUIMacrosClient",
       "preLaunchTask": "swift: Build Release DynamicSwiftUIMacrosClient (DynamicSwiftUIMacros)"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:DynamicSwiftUI}/Foo",
+      "name": "Debug FooApp (Foo)",
+      "program": "${workspaceFolder:DynamicSwiftUI}/Foo/.build/debug/FooApp",
+      "preLaunchTask": "swift: Build Debug FooApp (Foo)"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:DynamicSwiftUI}/Foo",
+      "name": "Release FooApp (Foo)",
+      "program": "${workspaceFolder:DynamicSwiftUI}/Foo/.build/release/FooApp",
+      "preLaunchTask": "swift: Build Release FooApp (Foo)"
     }
   ]
 }
