@@ -5,6 +5,8 @@
 import DynamicSwiftUITransferProtocol
 import Foundation
 
+@_exported import DynamicSwiftUIMacros
+
 public protocol DynamicApp {
     associatedtype Body: Scene
     @MainActor var body: Self.Body { get }

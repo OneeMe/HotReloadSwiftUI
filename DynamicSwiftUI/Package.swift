@@ -16,6 +16,7 @@ let package = Package(
             targets: ["DynamicSwiftUI"]),
     ],
     dependencies: [
+        .package(name: "DynamicSwiftUIMacros", path: "../DynamicSwiftUIMacros"),
         .package(name: "DynamicSwiftUITransferProtocol", path: "../DynamicSwiftUITransferProtocol")
     ],
     targets: [
@@ -23,7 +24,7 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "DynamicSwiftUI",
-            dependencies: ["DynamicSwiftUITransferProtocol"]),
+            dependencies: ["DynamicSwiftUITransferProtocol", "DynamicSwiftUIMacros"]),
         .testTarget(
             name: "DynamicSwiftUITests",
             dependencies: ["DynamicSwiftUI"]
