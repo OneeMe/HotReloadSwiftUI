@@ -2,12 +2,11 @@
 // https://docs.swift.org/swift-book
 
 import DynamicSwiftUI
+import Foo
 
 @main 
-struct Foo: DynamicApp {
+struct FooApp: DynamicApp {
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+        App().body
     }
 }

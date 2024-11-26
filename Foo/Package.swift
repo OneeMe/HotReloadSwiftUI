@@ -9,15 +9,22 @@ let package = Package(
         .macOS(.v15),
         .iOS(.v15),
     ],
+    products: [
+        .library(name: "Foo", targets: ["Foo"]),
+    ],
     dependencies: [
         .package(name: "DynamicSwiftUI", path: "../DynamicSwiftUI"),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "Foo",
-            dependencies: ["DynamicSwiftUI"]
+            name: "FooApp",
+            dependencies: ["Foo", "DynamicSwiftUI"],
+            path: "Sources/FooApp"
+        ),
+        .target(
+            name: "Foo", 
+            dependencies: ["DynamicSwiftUI"], 
+            path: "Sources/Foo"
         ),
     ]
 )
