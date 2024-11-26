@@ -10,11 +10,10 @@ import Foo
 struct ContentView: View {
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-            DynamicSwiftUIRunner(id: "Foo", content: Foo.ContentView())
+            Text("This is text from Native SwiftUI")
+            Group {
+                DynamicSwiftUIRunner(id: "Foo", content: Foo.ContentView())
+            }
         }
         .padding()
     }

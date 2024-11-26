@@ -15,7 +15,6 @@ public struct ContentView: View {
     
     public var body: some View {
         Button("Button From Foo: count: \(count)") {
-            print("count is \(count)")
             count += 1
         }
     }

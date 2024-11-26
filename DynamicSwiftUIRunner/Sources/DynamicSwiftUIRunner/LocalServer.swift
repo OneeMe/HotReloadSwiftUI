@@ -36,6 +36,7 @@ class LocalServer {
             disconnected: { [weak self] session in
                 print("WebSocket client disconnected")
                 self?.sessions.remove(session)
+                self?.dataSubject.send("")
             }
         )
         

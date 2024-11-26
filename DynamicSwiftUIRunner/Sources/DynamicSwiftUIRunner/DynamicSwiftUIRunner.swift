@@ -15,17 +15,25 @@ class RenderState: ObservableObject {
         self.server = server
         
         server.dataPublisher
-            .compactMap { jsonString -> RenderData? in
-                guard let data = jsonString.data(using: .utf8),
-                      let renderData = try? JSONDecoder().decode(RenderData.self, from: data)
-                else {
-                    print("Failed to decode JSON: \(jsonString)")
-                    return nil
+            .sink { [weak self] jsonString in
+                do {
+                    guard let data = jsonString.data(using: .utf8) else {
+                        throw NSError(domain: "RenderState", code: -1, 
+                            userInfo: [NSLocalizedDescriptionKey: "无法将字符串转换为数据"])
+                    }
+                    
+                    let renderData = try JSONDecoder().decode(RenderData.self, from: data)
+                    
+                    DispatchQueue.main.async {
+                        self?.data = renderData
+                    }
+                } catch {
+                    DispatchQueue.main.async {
+                        self?.data = nil
+                        print("解码 JSON 失败: \(jsonString), 错误: \(error)")
+                    }
                 }
-                return renderData
             }
-            .receive(on: DispatchQueue.main)
-            .assign(to: \.data, on: self)
             .store(in: &cancellables)
     }
 }
@@ -50,11 +58,14 @@ public struct DynamicSwiftUIRunner: View {
     }
     
     public var body: some View {
-        Group {
-            if let node = state.data?.tree {
-                buildView(from: node)
-            } else {
-                AnyView(self.content)
+        VStack {
+            Text("Current Renderer is \(state.data?.tree == nil ? "native" : "network")")
+            Group {
+                if let node = state.data?.tree {
+                    buildView(from: node)
+                } else {
+                    AnyView(self.content)
+                }
             }
         }
     }
