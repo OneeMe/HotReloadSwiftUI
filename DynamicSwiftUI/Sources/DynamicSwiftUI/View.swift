@@ -48,7 +48,7 @@ extension TupleView: ViewConvertible {
             let childView = child.value as! any View
             return processView(childView)
         }
-        return Node(id: UUID().uuidString, type: .vStack, data: [:], children: children)
+        return Node(id: UUID().uuidString, type: .tupleContainer, data: [:], children: children)
     }
 }
 

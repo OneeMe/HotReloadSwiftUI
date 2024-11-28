@@ -84,12 +84,29 @@ public struct DynamicSwiftUIRunner: View {
             })
         case .vStack:
             if let children = node.children {
-                // 渲染 VStack
-                AnyView(VStack(spacing: CGFloat(Float(node.data["spacing"] ?? "0") ?? 0)) {
+                AnyView(VStack(spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
                     ForEach(children, id: \.id) { child in
                         buildView(from: child)
                     }
                 })
+            } else {
+                AnyView(EmptyView())
+            }
+        case .hStack:
+            if let children = node.children {
+                AnyView(HStack(spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
+                    ForEach(children, id: \.id) { child in
+                        buildView(from: child)
+                    }
+                })
+            } else {
+                AnyView(EmptyView())
+            }
+        case .tupleContainer:
+            if let children = node.children {
+                AnyView(TupleView(children.map { child in
+                    buildView(from: child)
+                }))
             } else {
                 AnyView(EmptyView())
             }

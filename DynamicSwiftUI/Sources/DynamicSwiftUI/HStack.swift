@@ -7,14 +7,14 @@ import DynamicSwiftUITransferProtocol
 import Foundation
 
 @MainActor
-public struct VStack<Content: View>: View {
+public struct HStack<Content: View>: View {
     let id: String = UUID().uuidString
     let content: Content
     let spacing: CGFloat?
-    let alignment: HorizontalAlignment
+    let alignment: VerticalAlignment
     
     public init(
-        alignment: HorizontalAlignment = .center,
+        alignment: VerticalAlignment = .center,
         spacing: CGFloat? = nil,
         @ViewBuilder content: () -> Content
     ) {
@@ -28,7 +28,7 @@ public struct VStack<Content: View>: View {
     }
 }
 
-extension VStack: ViewConvertible {
+extension HStack: ViewConvertible {
     func convertToNode() -> Node {
         // 将子视图转换为 Node
         let childNode = processView(content)
@@ -41,7 +41,7 @@ extension VStack: ViewConvertible {
             children = [childNode]
         }
         
-        // 构建 VStack 的数据
+        // 构建 HStack 的数据
         var data: [String: String] = [:]
         if let spacing = spacing {
             data["spacing"] = "\(spacing)"
@@ -50,15 +50,15 @@ extension VStack: ViewConvertible {
         
         return Node(
             id: id,
-            type: .vStack,
+            type: .hStack,
             data: data,
             children: children
         )
     }
 }
 
-public enum HorizontalAlignment {
-    case leading
+public enum VerticalAlignment {
+    case top
     case center
-    case trailing
-}
+    case bottom
+} 

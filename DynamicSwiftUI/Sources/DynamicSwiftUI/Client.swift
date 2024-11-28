@@ -108,7 +108,9 @@ let webSocketClient = WebSocketClient()
 @MainActor func processView<V: View>(_ view: V) -> Node {
     print("will process view \(type(of: view))")
     if let convertible = view as? ViewConvertible {
-        return convertible.convertToNode()
+        let node = convertible.convertToNode()
+        print("node is \(node)")
+        return node
     }
     return processView(view.body)
 }

@@ -15,7 +15,9 @@ public struct Node: Codable, Sendable {
     public enum NodeType: String, Codable, Sendable {
         case text
         case vStack
+        case hStack
         case button
+        case tupleContainer
     }
     
     public let id: String
