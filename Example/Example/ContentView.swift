@@ -6,14 +6,38 @@
 import DynamicSwiftUIRunner
 import SwiftUI
 import Foo
+import FooContent
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Text("This is text from Native SwiftUI")
-            FooContentView()
+    @Environment(ModelData.self) var modelData
+    @State private var showFavoritesOnly = false
+
+    var filteredLandmarks: [Landmark] {
+        modelData.landmarks.filter { landmark in
+            (!showFavoritesOnly || landmark.isFavorite)
         }
-        .padding()
+    }
+
+    var body: some View {
+        NavigationSplitView {
+            List {
+                Toggle(isOn: $showFavoritesOnly) {
+                    Text("Favorites only")
+                }
+
+                ForEach(filteredLandmarks) { landmark in
+                    NavigationLink {
+                        FooLandmarkDetail(landmark: landmark)
+                    } label: {
+                        LandmarkRow(landmark: landmark)
+                    }
+                }
+            }
+            .animation(.default, value: filteredLandmarks)
+            .navigationTitle("Landmarks（宿主 App）")
+        } detail: {
+            Text("Select a Landmark")
+        }
     }
 }
 

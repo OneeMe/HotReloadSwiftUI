@@ -16,8 +16,10 @@ public struct FooApp: App {
     public init() {}
 
     public var body: some Scene {
-        WindowGroup {
-            ContentView()
+        WindowGroup(id: "Foo", for: Landmark.self) { $arg in
+            LandmarkDetail(landmark: arg)
+        } defaultValue: {
+            defaultLandMark
         }
     }
 }

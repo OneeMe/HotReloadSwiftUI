@@ -117,11 +117,8 @@
 			);
 			name = Example;
 			packageProductDependencies = (
-				BDE8AFE12CF275AC00DCC746 /* DynamicSwiftUIRunner */,
-				BDE8B07B2CF34BFF00DCC746 /* DynamicSwiftUIRunner */,
 				BDDF9AAC2CF5AD5B00AB2D7A /* Foo */,
 				BDDF9C062CF5E2BD00AB2D7A /* Foo */,
-				BD6FBE9D2CF5FEB5009C6EF1 /* FooWrapper */,
 				BD6FBEC02CF5FFCC009C6EF1 /* Foo */,
 				BD6FBED62CF6003F009C6EF1 /* Foo */,
 			);
@@ -615,10 +612,6 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		BD6FBE9D2CF5FEB5009C6EF1 /* FooWrapper */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = FooWrapper;
-		};
 		BD6FBEC02CF5FFCC009C6EF1 /* Foo */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Foo;
@@ -634,14 +627,6 @@
 		BDDF9C062CF5E2BD00AB2D7A /* Foo */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Foo;
-		};
-		BDE8AFE12CF275AC00DCC746 /* DynamicSwiftUIRunner */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = DynamicSwiftUIRunner;
-		};
-		BDE8B07B2CF34BFF00DCC746 /* DynamicSwiftUIRunner */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = DynamicSwiftUIRunner;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

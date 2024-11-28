@@ -41,14 +41,16 @@ class RenderState: ObservableObject {
 
 public struct DynamicSwiftUIRunner: View {
     let id: String
+    let arg: any Codable
     let content: any View
     #if DEBUG
     @StateObject private var state: RenderState
     private let server: LocalServer
     #endif
     
-    public init(id: String, content: any View) {
+    public init(id: String, arg: any Codable,content: any View) {
         self.id = id
+        self.arg = arg
         // TODO: use id and dynamic register to match the App struct
         self.content = content
         #if DEBUG
