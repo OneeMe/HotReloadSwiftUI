@@ -131,7 +131,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             })
         case .vStack:
             if let children = node.children {
-                AnyView(VStack(spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
+                AnyView(VStack(alignment: parseHorizontalAlignment(node.data["alignment"]), spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
                     ForEach(children, id: \.id) { child in
                         buildView(from: child)
                     }
@@ -141,7 +141,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             }
         case .hStack:
             if let children = node.children {
-                AnyView(HStack(spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
+                AnyView(HStack(alignment: parseVerticalAlignment(node.data["alignment"]), spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
                     ForEach(children, id: \.id) { child in
                         buildView(from: child)
                     }
@@ -296,6 +296,24 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             default:
                 content
             }
+        }
+    }
+    
+    private func parseHorizontalAlignment(_ str: String?) -> HorizontalAlignment {
+        guard let str = str else { return .center }
+        switch str {
+        case "leading": return .leading
+        case "trailing": return .trailing
+        default: return .center
+        }
+    }
+    
+    private func parseVerticalAlignment(_ str: String?) -> VerticalAlignment {
+        guard let str = str else { return .center }
+        switch str {
+        case "top": return .top
+        case "bottom": return .bottom
+        default: return .center
         }
     }
 }
