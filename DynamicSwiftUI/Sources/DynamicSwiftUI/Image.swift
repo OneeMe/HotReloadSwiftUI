@@ -9,12 +9,20 @@ import Foundation
 @MainActor
 public struct Image: View {
     let id: String = UUID().uuidString
-    let systemName: String
+    let imageName: String?
+    let systemName: String?
     var imageScale: ImageScale = .medium
     var foregroundStyle: ForegroundStyle = .primary
     
     public init(systemName: String) {
         self.systemName = systemName
+        self.imageName = nil
+    }
+
+    public init(_ name: String, bundle: Bundle? = nil) {
+        self.imageName = name
+        self.systemName = nil
+        // TODO: 添加 bundle 支持
     }
     
     public var body: some View {
@@ -49,7 +57,8 @@ public enum ForegroundStyle: String {
 extension Image: ViewConvertible {
     func convertToNode() -> Node {
         var data: [String: String] = [
-            "systemName": systemName,
+            "imageName": imageName ?? "",
+            "systemName": systemName ?? "",
             "imageScale": imageScale.rawValue,
             "foregroundStyle": foregroundStyle.rawValue
         ]

@@ -119,7 +119,13 @@ public struct DynamicSwiftUIRunner: View {
                 AnyView(EmptyView())
             }
         case .image:
-            let image = Image(systemName: node.data["systemName"] ?? "")
+            let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
+                Image(imageName)
+            } else if let systemName = node.data["systemName"], !systemName.isEmpty {
+                Image(systemName: systemName)
+            } else {
+                Image(systemName: "questionmark")
+            }
             let imageScale: Image.Scale = {
                 switch node.data["imageScale"] {
                 case "small": return .small
