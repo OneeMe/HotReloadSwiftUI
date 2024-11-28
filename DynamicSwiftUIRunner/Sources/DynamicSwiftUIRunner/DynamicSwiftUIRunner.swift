@@ -17,6 +17,12 @@ class RenderState: ObservableObject {
         
         server.dataPublisher
             .sink { [weak self] jsonString in
+                if jsonString.isEmpty {
+                    DispatchQueue.main.async {
+                        self?.data = nil
+                        print("接收到空字符串，意味着断联，将数据置空")
+                    }
+                }
                 do {
                     guard let data = jsonString.data(using: .utf8) else {
                         throw NSError(domain: "RenderState", code: -1,
