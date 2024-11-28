@@ -48,7 +48,10 @@ public struct DynamicSwiftUIRunner: View {
     private let server: LocalServer
     #endif
     
-    public init(id: String, arg: any Codable,content: any View) {
+    @State private var gradientStart = UnitPoint(x: -1, y: 0.5)
+    @State private var gradientEnd = UnitPoint(x: 0, y: 0.5)
+    
+    public init(id: String, arg: any Codable, content: any View) {
         self.id = id
         self.arg = arg
         // TODO: use id and dynamic register to match the App struct
@@ -61,8 +64,34 @@ public struct DynamicSwiftUIRunner: View {
     }
     
     public var body: some View {
-        VStack {
-            Text("Current Renderer is \(state.data?.tree == nil ? "native" : "network")")
+        VStack(spacing: 0) {
+            Group {
+                Text("当前渲染内容来自： \(state.data?.tree == nil ? "native" : "network")")
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 5)
+            .background(
+                Group {
+                    if state.data?.tree == nil {
+                        Color.white
+                    } else {
+                        LinearGradient(
+                            colors: [.blue, .purple, .pink],
+                            startPoint: gradientStart,
+                            endPoint: gradientEnd
+                        )
+                        .onAppear {
+                            withAnimation(
+                                .linear(duration: 2)
+                                .repeatForever(autoreverses: false)
+                            ) {
+                                gradientStart = UnitPoint(x: 1, y: 0.5)
+                                gradientEnd = UnitPoint(x: 2, y: 0.5)
+                            }
+                        }
+                    }
+                }
+            )
             Group {
                 if let node = state.data?.tree {
                     buildView(from: node)
@@ -122,34 +151,34 @@ public struct DynamicSwiftUIRunner: View {
                 AnyView(EmptyView())
             }
         case .image: {
-            let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
-                Image(imageName)
-            } else if let systemName = node.data["systemName"], !systemName.isEmpty {
-                Image(systemName: systemName)
-            } else {
-                Image(systemName: "questionmark")
-            }
-            let imageScale: Image.Scale = {
-                switch node.data["imageScale"] {
-                case "small": return .small
-                case "large": return .large
-                default: return .medium
+                let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
+                    Image(imageName)
+                } else if let systemName = node.data["systemName"], !systemName.isEmpty {
+                    Image(systemName: systemName)
+                } else {
+                    Image(systemName: "questionmark")
                 }
-            }()
-            let foregroundStyle: some ShapeStyle = {
-                switch node.data["foregroundStyle"] {
-                case "tint": return Color.accentColor
-                case "secondary": return Color.secondary
-                default: return Color.primary
-                }
-            }()
+                let imageScale: Image.Scale = {
+                    switch node.data["imageScale"] {
+                    case "small": return .small
+                    case "large": return .large
+                    default: return .medium
+                    }
+                }()
+                let foregroundStyle: some ShapeStyle = {
+                    switch node.data["foregroundStyle"] {
+                    case "tint": return Color.accentColor
+                    case "secondary": return Color.secondary
+                    default: return Color.primary
+                    }
+                }()
             
-            return AnyView(
-                image
-                    .imageScale(imageScale)
-                    .foregroundStyle(foregroundStyle)
-            )
-        }()
+                return AnyView(
+                    image
+                        .imageScale(imageScale)
+                        .foregroundStyle(foregroundStyle)
+                )
+            }()
         default:
             AnyView(EmptyView())
         }
