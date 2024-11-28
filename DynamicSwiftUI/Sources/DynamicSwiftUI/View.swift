@@ -87,4 +87,15 @@ public extension View {
             )
         )
     }
+
+    @inlinable
+    @MainActor func clipShape<S: Shape>(
+        _ shape: S,
+        style: FillStyle = FillStyle()
+    ) -> ModifiedContent<Self, ClipShapeModifier<S>> {
+        ModifiedContent(
+            content: self,
+            modifier: ClipShapeModifier(shape: shape, style: style)
+        )
+    }
 }

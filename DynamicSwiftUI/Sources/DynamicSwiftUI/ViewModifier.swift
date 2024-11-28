@@ -60,4 +60,15 @@ public struct PaddingModifier: ViewModifier {
         self.edges = edges
         self.length = length
     }
-} 
+}
+
+@MainActor
+public struct ClipShapeModifier<S: Shape>: ViewModifier {
+    let shape: S
+    let style: FillStyle
+    
+    public init(shape: S, style: FillStyle = FillStyle()) {
+        self.shape = shape
+        self.style = style
+    }
+}

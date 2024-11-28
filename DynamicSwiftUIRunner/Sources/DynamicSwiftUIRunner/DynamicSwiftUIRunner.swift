@@ -156,6 +156,7 @@ public struct DynamicSwiftUIRunner: View {
         view
             .modifier(FrameViewModifier(node: node))
             .modifier(PaddingViewModifier(node: node))
+            .modifier(ClipShapeViewModifier(node: node))
     }
     
     private struct FrameViewModifier: ViewModifier {
@@ -218,6 +219,27 @@ public struct DynamicSwiftUIRunner: View {
                     }
                 }
                 return result
+            }
+        }
+    }
+    
+    private struct ClipShapeViewModifier: ViewModifier {
+        let node: Node
+        
+        func body(content: Content) -> some View {
+            if let clipShapeData = node.modifier?.clipShape {
+                switch clipShapeData.shapeType {
+                case "circle":
+                    content.clipShape(Circle())
+                case "rectangle":
+                    content.clipShape(Rectangle())
+                case "capsule":
+                    content.clipShape(Capsule())
+                default:
+                    content
+                }
+            } else {
+                content
             }
         }
     }

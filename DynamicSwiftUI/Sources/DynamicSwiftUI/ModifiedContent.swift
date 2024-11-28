@@ -41,6 +41,11 @@ extension ModifiedContent: ViewConvertible {
                 length: paddingModifier.length
             )
             nodeModifier = Node.Modifier(padding: paddingData)
+        } else if let clipShapeModifier = modifier as? any ViewModifier {
+            if let shape = Mirror(reflecting: clipShapeModifier).children.first?.value as? (any Shape) {
+                let clipShapeData = Node.ClipShapeData(shapeType: shape.type.rawValue)
+                nodeModifier = Node.Modifier(clipShape: clipShapeData)
+            }
         }
         
         return Node(

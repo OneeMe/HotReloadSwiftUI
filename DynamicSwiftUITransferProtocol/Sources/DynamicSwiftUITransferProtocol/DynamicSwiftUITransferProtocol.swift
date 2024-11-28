@@ -26,13 +26,16 @@ public struct Node: Codable, Sendable {
     public struct Modifier: Codable, Sendable {
         public var frame: FrameData?
         public var padding: PaddingData?
+        public var clipShape: ClipShapeData?
         
         public init(
             frame: FrameData? = nil,
-            padding: PaddingData? = nil
+            padding: PaddingData? = nil,
+            clipShape: ClipShapeData? = nil
         ) {
             self.frame = frame
             self.padding = padding
+            self.clipShape = clipShape
         }
     }
     
@@ -62,6 +65,14 @@ public struct Node: Codable, Sendable {
         ) {
             self.edges = edges
             self.length = length
+        }
+    }
+    
+    public struct ClipShapeData: Codable, Sendable {
+        public let shapeType: String
+        
+        public init(shapeType: String) {
+            self.shapeType = shapeType
         }
     }
     
