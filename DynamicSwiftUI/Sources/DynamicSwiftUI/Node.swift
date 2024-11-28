@@ -92,6 +92,6 @@ final class ViewHierarchyManager {
         if let view = currentView {
             return processView(view)
         }
-        return Node(id: "", type: .container, data: [:])
+        return Node(id: "", type: .vStack, data: [:])
     }
 } 

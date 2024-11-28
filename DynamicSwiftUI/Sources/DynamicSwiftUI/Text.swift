@@ -19,7 +19,7 @@ public struct Text: View {
 }
 
 extension Text: ViewConvertible {
-    nonisolated func convertToNode() -> Node {
+    func convertToNode() -> Node {
         return Node(id: id, type: .text, data: ["text": content])
     }
 }

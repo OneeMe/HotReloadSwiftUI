@@ -4,6 +4,7 @@
 //
 
 import DynamicSwiftUITransferProtocol
+import Foundation
 
 @MainActor
 public protocol View {
@@ -13,11 +14,45 @@ public protocol View {
 
 @resultBuilder
 public enum ViewBuilder {
+    // 单个视图的情况
     public static func buildBlock<Content: View>(_ content: Content) -> Content {
         content
     }
+    
+    // 使用参数包处理多个视图
+    @MainActor
+    public static func buildBlock<each Content>(_ content: repeat each Content) -> TupleView<(repeat each Content)> where repeat each Content: View {
+        TupleView((repeat each content))
+    }
 }
 
+// 用于组合多个视图的容器
+@MainActor
+public struct TupleView<T>: View {
+    public let value: T
+    
+    public init(_ value: T) {
+        self.value = value
+    }
+    
+    public var body: some View {
+        self
+    }
+}
+
+// 扩展 TupleView 以支持转换为 Node
+extension TupleView: ViewConvertible {
+    func convertToNode() -> Node {
+        let mirror = Mirror(reflecting: value)
+        let children = mirror.children.map { child -> Node in
+            let childView = child.value as! any View
+            return processView(childView)
+        }
+        return Node(id: UUID().uuidString, type: .vStack, data: [:], children: children)
+    }
+}
+
+@MainActor
 protocol ViewConvertible {
     func convertToNode() -> Node
 }

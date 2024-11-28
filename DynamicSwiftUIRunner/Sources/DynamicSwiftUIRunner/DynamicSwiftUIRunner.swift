@@ -18,8 +18,8 @@ class RenderState: ObservableObject {
             .sink { [weak self] jsonString in
                 do {
                     guard let data = jsonString.data(using: .utf8) else {
-                        throw NSError(domain: "RenderState", code: -1, 
-                            userInfo: [NSLocalizedDescriptionKey: "无法将字符串转换为数据"])
+                        throw NSError(domain: "RenderState", code: -1,
+                                      userInfo: [NSLocalizedDescriptionKey: "无法将字符串转换为数据"])
                     }
                     
                     let renderData = try JSONDecoder().decode(RenderData.self, from: data)
@@ -76,16 +76,22 @@ public struct DynamicSwiftUIRunner: View {
         case .text:
             AnyView(Text(node.data["text"] ?? ""))
         case .button:
-            Button(node.data["title"] ?? "") {
+            AnyView(Button(node.data["title"] ?? "") {
                 let interactiveData = InteractiveData(id: node.id, type: .tap)
                 Task {
                     await server.send(interactiveData)
                 }
-            }
-        case .container:
+            })
+        case .vStack:
             if let children = node.children {
-                // TODO: Implement container view
-                EmptyView()
+                // 渲染 VStack
+                AnyView(VStack(spacing: CGFloat(Float(node.data["spacing"] ?? "0") ?? 0)) {
+                    ForEach(children, id: \.id) { child in
+                        buildView(from: child)
+                    }
+                })
+            } else {
+                AnyView(EmptyView())
             }
         }
     }

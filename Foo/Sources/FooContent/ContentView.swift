@@ -14,8 +14,19 @@ public struct ContentView: View {
     public init() {}
     
     public var body: some View {
-        Button("Button From Foo: count: \(count)") {
-            count += 1
+        VStack {
+            Button("Button From Foo: count: \(count)") {
+                count += 1
+            }
+            Button("Button From Foo: count: \(count)") {
+                count += 1
+            }
         }
     }
 }
+
+#if !ENABLE_DYNAMIC_SWIFTUI
+#Preview {
+    ContentView()
+}
+#endif

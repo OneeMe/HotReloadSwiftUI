@@ -102,7 +102,7 @@ let webSocketClient = WebSocketClient()
         ViewHierarchyManager.shared.setCurrentView(windowGroup.content)
         return processView(windowGroup.content)
     }
-    return Node(id: "", type: .container, data: [:])
+    return Node(id: "", type: .vStack, data: [:])
 }
 
 @MainActor func processView<V: View>(_ view: V) -> Node {

@@ -14,7 +14,7 @@ public struct RenderData: Codable, Sendable {
 public struct Node: Codable, Sendable {
     public enum NodeType: String, Codable, Sendable {
         case text
-        case container
+        case vStack
         case button
     }
     
