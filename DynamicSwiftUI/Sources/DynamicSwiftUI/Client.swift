@@ -10,6 +10,7 @@ actor WebSocketClient {
     var isConnected = false
     private var webSocket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
+    private var continuations: [CheckedContinuation<Data, Error>] = []
     
     func setup() {
         guard let url = URL(string: "ws://localhost:8080/ws") else { return }
@@ -89,21 +90,26 @@ actor WebSocketClient {
         }
     }
     
+    func waitForLaunchData() async throws -> Data {
+        print("wait for server's launch data")
+        return try await withCheckedThrowingContinuation { continuation in
+            continuations.append(continuation)
+        }
+    }
+    
+    func receivedLaunchData(_ data: Data) {
+        if let continuation = continuations.first {
+            continuations.removeFirst()
+            continuation.resume(returning: data)
+        }
+    }
+    
     deinit {
         webSocket?.cancel(with: .goingAway, reason: nil)
     }
 }
 
 let webSocketClient = WebSocketClient()
-
-@MainActor func processScene<S: Scene>(_ scene: S) -> Node {
-    print("scene type is \(type(of: scene))")
-    if let windowGroup = scene as? WindowGroup {
-        ViewHierarchyManager.shared.setCurrentView(windowGroup.content)
-        return processView(windowGroup.content)
-    }
-    return Node(id: "", type: .vStack, data: [:])
-}
 
 @MainActor func processView<V: View>(_ view: V) -> Node {
     print("will process view \(type(of: view))")

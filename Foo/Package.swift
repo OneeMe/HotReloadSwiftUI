@@ -19,7 +19,7 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "FooApp",
-            dependencies: ["Foo", "DynamicSwiftUI"],
+            dependencies: ["FooContent", "DynamicSwiftUI"],
             swiftSettings: [
                 .define("ENABLE_DYNAMIC_SWIFTUI")
             ]

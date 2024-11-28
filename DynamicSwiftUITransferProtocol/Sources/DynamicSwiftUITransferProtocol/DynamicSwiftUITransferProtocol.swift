@@ -21,6 +21,7 @@ public struct Node: Codable, Sendable {
         case divider
         case spacer
         case image
+        case binding
     }
     
     public struct Modifier: Codable, Sendable {

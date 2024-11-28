@@ -16,8 +16,8 @@ public struct FooApp: App {
     public init() {}
 
     public var body: some Scene {
-        WindowGroup(id: "Foo", for: Landmark.self) { $arg in
-            LandmarkDetail(landmark: arg)
+        WindowGroup(id: "Foo", for: Landmark.self) { arg in
+            LandmarkDetail(landmark: arg.wrappedValue)
         } defaultValue: {
             defaultLandMark
         }
