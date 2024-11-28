@@ -15,6 +15,8 @@ public struct FooLandmarkDetail: View {
     }
     
     public var body: some View {
-        DynamicSwiftUIRunner(id: "Foo", arg: landmark, content: FooContent.LandmarkDetail(landmark: landmark) as! (any View))
+        DynamicSwiftUIRunner(id: "Foo", arg: landmark) {
+            FooContent.LandmarkDetail(landmark: landmark)
+        }
     }
 }

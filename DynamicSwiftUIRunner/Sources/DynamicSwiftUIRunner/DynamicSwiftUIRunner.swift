@@ -39,10 +39,10 @@ class RenderState: ObservableObject {
     }
 }
 
-public struct DynamicSwiftUIRunner: View {
+public struct DynamicSwiftUIRunner<Inner: View>: View {
     let id: String
     let arg: any Codable
-    let content: any View
+    let content: Inner
     #if DEBUG
     @StateObject private var state: RenderState
     private let server: LocalServer
@@ -51,11 +51,15 @@ public struct DynamicSwiftUIRunner: View {
     @State private var gradientStart = UnitPoint(x: -1, y: 0.5)
     @State private var gradientEnd = UnitPoint(x: 0, y: 0.5)
     
-    public init(id: String, arg: any Codable, content: any View) {
+    public init(
+        id: String,
+        arg: any Codable,
+        @ViewBuilder content: () -> Inner
+    ) {
         self.id = id
         self.arg = arg
         // TODO: use id and dynamic register to match the App struct
-        self.content = content
+        self.content = content()
         #if DEBUG
         let server = LocalServer()
         _state = StateObject(wrappedValue: RenderState(id: id, server: server))
@@ -96,7 +100,7 @@ public struct DynamicSwiftUIRunner: View {
                 if let node = state.data?.tree {
                     buildView(from: node)
                 } else {
-                    AnyView(self.content)
+                    content
                 }
             }
         }
