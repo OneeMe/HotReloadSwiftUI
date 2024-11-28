@@ -111,4 +111,50 @@ public struct InteractiveData: Codable, Sendable {
         self.type = type
     }
 }
+
+public enum TransferMessage: Codable, Sendable {
+    case initialArg(Data)  // 初始化参数
+    case renderData(RenderData)  // 渲染数据
+    case interactiveData(InteractiveData)  // 交互数据
+    
+    private enum CodingKeys: String, CodingKey {
+        case type
+        case payload
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        
+        switch type {
+        case "initialArg":
+            let data = try container.decode(Data.self, forKey: .payload)
+            self = .initialArg(data)
+        case "renderData":
+            let renderData = try container.decode(RenderData.self, forKey: .payload)
+            self = .renderData(renderData)
+        case "interactiveData":
+            let interactiveData = try container.decode(InteractiveData.self, forKey: .payload)
+            self = .interactiveData(interactiveData)
+        default:
+            throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unknown message type"))
+        }
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        switch self {
+        case .initialArg(let data):
+            try container.encode("initialArg", forKey: .type)
+            try container.encode(data, forKey: .payload)
+        case .renderData(let renderData):
+            try container.encode("renderData", forKey: .type)
+            try container.encode(renderData, forKey: .payload)
+        case .interactiveData(let interactiveData):
+            try container.encode("interactiveData", forKey: .type)
+            try container.encode(interactiveData, forKey: .payload)
+        }
+    }
+}
     

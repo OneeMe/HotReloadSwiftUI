@@ -36,9 +36,17 @@ actor WebSocketClient {
             case .string(let text):
                 print("Received message: \(text)")
                 if let data = text.data(using: .utf8),
-                   let interactiveData = try? JSONDecoder().decode(InteractiveData.self, from: data)
+                   let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data)
                 {
-                    handleInteraction(interactiveData)
+                    switch transferMessage {
+                    case .interactiveData(let interactiveData):
+                        handleInteraction(interactiveData)
+                    case .initialArg(let data):
+                        receivedLaunchData(data)
+                    case .renderData:
+                        // 客户端不需要处理 renderData
+                        break
+                    }
                 }
             case .data(let data):
                 print("Received data: \(data)")
@@ -76,7 +84,8 @@ actor WebSocketClient {
             setup()
         }
         
-        guard let jsonData = try? JSONEncoder().encode(data),
+        let transferMessage = TransferMessage.renderData(data)
+        guard let jsonData = try? JSONEncoder().encode(transferMessage),
               let jsonString = String(data: jsonData, encoding: .utf8)
         else {
             return
@@ -91,6 +100,9 @@ actor WebSocketClient {
     }
     
     func waitForLaunchData() async throws -> Data {
+        if !isConnected {
+            setup()
+        }
         print("wait for server's launch data")
         return try await withCheckedThrowingContinuation { continuation in
             continuations.append(continuation)

@@ -8,7 +8,6 @@ import Foundation
 
 @MainActor
 public struct AnyView: View {
-    private let id: String = UUID().uuidString
     private let _makeView: () -> any View
     
     public init<V: View>(_ view: V) {

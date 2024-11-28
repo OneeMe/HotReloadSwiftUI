@@ -23,10 +23,16 @@ class RenderState: ObservableObject {
                                       userInfo: [NSLocalizedDescriptionKey: "无法将字符串转换为数据"])
                     }
                     
-                    let renderData = try JSONDecoder().decode(RenderData.self, from: data)
-                    
-                    DispatchQueue.main.async {
-                        self?.data = renderData
+                    if let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data) {
+                        switch transferMessage {
+                        case .renderData(let renderData):
+                            DispatchQueue.main.async {
+                                self?.data = renderData
+                            }
+                        case .initialArg, .interactiveData:
+                            // Runner 端不需要处理这些消息类型
+                            break
+                        }
                     }
                 } catch {
                     DispatchQueue.main.async {
@@ -39,9 +45,9 @@ class RenderState: ObservableObject {
     }
 }
 
-public struct DynamicSwiftUIRunner<Inner: View>: View {
+public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     let id: String
-    let arg: any Codable
+    let arg: Arg
     let content: Inner
     #if DEBUG
     @StateObject private var state: RenderState
@@ -53,15 +59,14 @@ public struct DynamicSwiftUIRunner<Inner: View>: View {
     
     public init(
         id: String,
-        arg: any Codable,
-        @ViewBuilder content: () -> Inner
+        arg: Arg,
+        @ViewBuilder content: (_ arg: Arg) -> Inner
     ) {
         self.id = id
         self.arg = arg
-        // TODO: use id and dynamic register to match the App struct
-        self.content = content()
+        self.content = content(arg)
         #if DEBUG
-        let server = LocalServer()
+        let server = LocalServer(initialArg: arg)
         _state = StateObject(wrappedValue: RenderState(id: id, server: server))
         self.server = server
         #endif
@@ -115,7 +120,7 @@ public struct DynamicSwiftUIRunner<Inner: View>: View {
             AnyView(Button(node.data["title"] ?? "") {
                 let interactiveData = InteractiveData(id: node.id, type: .tap)
                 Task {
-                    await server.send(interactiveData)
+                    await server.sendInteractiveData(interactiveData)
                 }
             })
         case .vStack:

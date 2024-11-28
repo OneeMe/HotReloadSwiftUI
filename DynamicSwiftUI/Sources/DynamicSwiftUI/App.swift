@@ -26,35 +26,25 @@ func runApp<Root: App>(_ app: Root) async throws {
     // 获取启动参数
     let launchData = try await webSocketClient.waitForLaunchData()
     
+    var viewHierarchy = Node(id: "", type: .vStack, data: [:])
     // 处理 WindowGroup 场景
-    let viewHierarchy = if let windowGroup = scene as? WindowGroup<AnyView> {
-        switch windowGroup.contentType {
-        case .plain(let content):
-            // 普通视图直接处理
-            processView(content)
-            
-        case .parameterized(let presentedContent): {
-                // 尝试从启动数据中获取参数，如果没有则使用默认值
-                let arg = try? {
-                    if !launchData.isEmpty {
-                        return try presentedContent.decode(from: launchData)
-                    }
-                    return presentedContent.defaultValue()
-                }()
-            
-                // 创建绑定
-                let binding = Binding(
-                    get: { arg },
-                    set: { _ in
-                        // TOOD: 更新参数
-                    }
-                )
-            
-                return processView(presentedContent.content(binding))
-            }()
+    if let windowGroup = Mirror(reflecting: scene).children.first?.value {
+        // 使用 Mirror 获取 WindowGroup 的 content 成员
+        let windowGroupMirror = Mirror(reflecting: windowGroup)
+        if let content = windowGroupMirror.children.first?.value {
+            if let content = content as? any View {
+                // 普通视图直接处理
+                viewHierarchy = processView(content)
+            } else if let presentedContent = content as? AnyPresentedWindowContent {
+                viewHierarchy = processParameterizedContent(presentedContent, launchData: launchData)
+            } else {
+                viewHierarchy = Node(id: "", type: .vStack, data: [:])
+            }
+        } else {
+            viewHierarchy = Node(id: "", type: .vStack, data: [:])
         }
     } else {
-        Node(id: "", type: .vStack, data: [:])
+        viewHierarchy = Node(id: "", type: .vStack, data: [:])
     }
     
     let renderData = RenderData(tree: viewHierarchy)
@@ -74,6 +64,26 @@ func runApp<Root: App>(_ app: Root) async throws {
     }
 }
 
+@MainActor
+private func processParameterizedContent(_ presentedContent: AnyPresentedWindowContent, launchData: Data) -> Node {
+    let arg = try? {
+        if !launchData.isEmpty {
+            return try presentedContent.decode(from: launchData)
+        }
+        return presentedContent.defaultValue()
+    }()
+    
+    // 创建绑定
+    let binding = Binding(
+        get: { arg },
+        set: { _ in
+            // TODO: 更新参数
+        }
+    )
+    
+    return processView(presentedContent.content(binding))
+}
+
 public enum DynamicAppRegistry {
     private nonisolated(unsafe) static var apps: [String: any App.Type] = [:]
     
@@ -87,6 +97,6 @@ public enum DynamicAppRegistry {
     
     public static func createApp(name: String) -> (any App)? {
         guard let appType = apps[name] else { return nil }
-        return (appType.init() as? any App)
+        return appType.init()
     }
 }
