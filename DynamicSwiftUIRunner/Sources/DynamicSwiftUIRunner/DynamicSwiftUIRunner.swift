@@ -152,11 +152,13 @@ public struct DynamicSwiftUIRunner: View {
             AnyView(EmptyView())
         }
         
-        // 应用 frame 修饰
-        view.modifier(FrameModifier(node: node))
+        // 分别应用 frame 和 padding 修饰器
+        view
+            .modifier(FrameViewModifier(node: node))
+            .modifier(PaddingViewModifier(node: node))
     }
     
-    private struct FrameModifier: ViewModifier {
+    private struct FrameViewModifier: ViewModifier {
         let node: Node
         
         func body(content: Content) -> some View {
@@ -183,6 +185,39 @@ public struct DynamicSwiftUIRunner: View {
             case "bottom": return .bottom
             case "bottomTrailing": return .bottomTrailing
             default: return .center
+            }
+        }
+    }
+    
+    private struct PaddingViewModifier: ViewModifier {
+        let node: Node
+        
+        func body(content: Content) -> some View {
+            if let paddingData = node.modifier?.padding {
+                content.padding(parseEdges(paddingData.edges), paddingData.length)
+            } else {
+                content
+            }
+        }
+        
+        private func parseEdges(_ str: String) -> SwiftUI.Edge.Set {
+            switch str {
+            case "horizontal": return .horizontal
+            case "vertical": return .vertical
+            case "all": return .all
+            default:
+                let edges = str.split(separator: ",")
+                var result: SwiftUI.Edge.Set = []
+                for edge in edges {
+                    switch edge {
+                    case "top": result.insert(.top)
+                    case "leading": result.insert(.leading)
+                    case "bottom": result.insert(.bottom)
+                    case "trailing": result.insert(.trailing)
+                    default: break
+                    }
+                }
+                return result
             }
         }
     }

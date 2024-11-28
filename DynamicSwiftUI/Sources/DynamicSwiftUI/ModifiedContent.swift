@@ -22,19 +22,26 @@ public struct ModifiedContent<Content: View, Modifier: ViewModifier>: View {
     }
 }
 
-extension ModifiedContent: ViewConvertible where Modifier == FrameModifier {
+extension ModifiedContent: ViewConvertible {
     func convertToNode() -> Node {
         var childNode = processView(content)
+        var nodeModifier: Node.Modifier?
         
-        // 创建 frame 修饰器数据
-        let frameData = Node.FrameData(
-            width: modifier.width,
-            height: modifier.height,
-            alignment: modifier.alignment?.rawValue
-        )
-        
-        // 创建或更新修饰器
-        let nodeModifier = Node.Modifier(frame: frameData)
+        // 根据修饰器类型创建不同的修饰器数据
+        if let frameModifier = modifier as? FrameModifier {
+            let frameData = Node.FrameData(
+                width: frameModifier.width,
+                height: frameModifier.height,
+                alignment: frameModifier.alignment?.rawValue
+            )
+            nodeModifier = Node.Modifier(frame: frameData)
+        } else if let paddingModifier = modifier as? PaddingModifier {
+            let paddingData = Node.PaddingData(
+                edges: paddingModifier.edges.description,
+                length: paddingModifier.length
+            )
+            nodeModifier = Node.Modifier(padding: paddingData)
+        }
         
         return Node(
             id: childNode.id,
@@ -44,4 +51,4 @@ extension ModifiedContent: ViewConvertible where Modifier == FrameModifier {
             modifier: nodeModifier
         )
     }
-} 
+}

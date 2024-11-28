@@ -25,9 +25,14 @@ public struct Node: Codable, Sendable {
     
     public struct Modifier: Codable, Sendable {
         public var frame: FrameData?
+        public var padding: PaddingData?
         
-        public init(frame: FrameData? = nil) {
+        public init(
+            frame: FrameData? = nil,
+            padding: PaddingData? = nil
+        ) {
             self.frame = frame
+            self.padding = padding
         }
     }
     
@@ -44,6 +49,19 @@ public struct Node: Codable, Sendable {
             self.width = width
             self.height = height
             self.alignment = alignment
+        }
+    }
+    
+    public struct PaddingData: Codable, Sendable {
+        public let edges: String
+        public let length: CGFloat?
+        
+        public init(
+            edges: String,
+            length: CGFloat? = nil
+        ) {
+            self.edges = edges
+            self.length = length
         }
     }
     

@@ -73,4 +73,18 @@ public extension View {
             )
         )
     }
+
+    @inlinable
+    @MainActor func padding(
+        _ edges: Edge.Set = .all,
+        _ length: CGFloat? = nil
+    ) -> ModifiedContent<Self, PaddingModifier> {
+        ModifiedContent(
+            content: self,
+            modifier: PaddingModifier(
+                edges: edges,
+                length: length
+            )
+        )
+    }
 }
