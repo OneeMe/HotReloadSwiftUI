@@ -7,7 +7,11 @@
 
 import CoreLocation
 import Foundation
+#if ENABLE_DYNAMIC_SWIFTUI
+import DynamicSwiftUI
+#else
 import SwiftUI
+#endif
 
 public struct Landmark: Hashable, Codable, Identifiable, Sendable {
     public var id: Int
@@ -18,6 +22,7 @@ public struct Landmark: Hashable, Codable, Identifiable, Sendable {
     public var isFavorite: Bool
 
     private var imageName: String
+    @MainActor
     public var image: Image {
         Image(imageName)
     }

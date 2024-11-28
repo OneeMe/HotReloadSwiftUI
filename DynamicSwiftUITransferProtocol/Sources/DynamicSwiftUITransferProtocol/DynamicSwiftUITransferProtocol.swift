@@ -25,18 +25,61 @@ public struct Node: Codable, Sendable {
     }
     
     public struct Modifier: Codable, Sendable {
-        public var frame: FrameData?
-        public var padding: PaddingData?
-        public var clipShape: ClipShapeData?
+        public let type: ModifierType
+        public let data: ModifierData
         
-        public init(
-            frame: FrameData? = nil,
-            padding: PaddingData? = nil,
-            clipShape: ClipShapeData? = nil
-        ) {
-            self.frame = frame
-            self.padding = padding
-            self.clipShape = clipShape
+        public init(type: ModifierType, data: ModifierData) {
+            self.type = type
+            self.data = data
+        }
+    }
+    
+    public enum ModifierType: String, Codable, Sendable {
+        case frame
+        case padding
+        case clipShape
+    }
+    
+    public enum ModifierData: Codable, Sendable {
+        case frame(FrameData)
+        case padding(PaddingData)
+        case clipShape(ClipShapeData)
+        
+        private enum CodingKeys: String, CodingKey {
+            case type, data
+        }
+        
+        public func encode(to encoder: Encoder) throws {
+            var container = encoder.container(keyedBy: CodingKeys.self)
+            switch self {
+            case .frame(let data):
+                try container.encode("frame", forKey: .type)
+                try container.encode(data, forKey: .data)
+            case .padding(let data):
+                try container.encode("padding", forKey: .type)
+                try container.encode(data, forKey: .data)
+            case .clipShape(let data):
+                try container.encode("clipShape", forKey: .type)
+                try container.encode(data, forKey: .data)
+            }
+        }
+        
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            let type = try container.decode(String.self, forKey: .type)
+            switch type {
+            case "frame":
+                let data = try container.decode(FrameData.self, forKey: .data)
+                self = .frame(data)
+            case "padding":
+                let data = try container.decode(PaddingData.self, forKey: .data)
+                self = .padding(data)
+            case "clipShape":
+                let data = try container.decode(ClipShapeData.self, forKey: .data)
+                self = .clipShape(data)
+            default:
+                throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unknown modifier type"))
+            }
         }
     }
     
@@ -81,20 +124,20 @@ public struct Node: Codable, Sendable {
     public let type: NodeType
     public let data: [String: String]
     public let children: [Node]?
-    public let modifier: Modifier?
+    public let modifiers: [Modifier]?
     
     public init(
         id: String,
         type: NodeType,
         data: [String: String],
         children: [Node]? = nil,
-        modifier: Modifier? = nil
+        modifiers: [Modifier]? = nil
     ) {
         self.id = id
         self.type = type
         self.data = data
         self.children = children
-        self.modifier = modifier
+        self.modifiers = modifiers
     }
 }
 

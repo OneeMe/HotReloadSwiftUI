@@ -34,18 +34,24 @@ extension ModifiedContent: ViewConvertible {
                 height: frameModifier.height,
                 alignment: frameModifier.alignment?.rawValue
             )
-            nodeModifier = Node.Modifier(frame: frameData)
+            nodeModifier = Node.Modifier(type: .frame, data: .frame(frameData))
         } else if let paddingModifier = modifier as? PaddingModifier {
             let paddingData = Node.PaddingData(
                 edges: paddingModifier.edges.description,
                 length: paddingModifier.length
             )
-            nodeModifier = Node.Modifier(padding: paddingData)
+            nodeModifier = Node.Modifier(type: .padding, data: .padding(paddingData))
         } else if let clipShapeModifier = modifier as? any ViewModifier {
             if let shape = Mirror(reflecting: clipShapeModifier).children.first?.value as? (any Shape) {
                 let clipShapeData = Node.ClipShapeData(shapeType: shape.type.rawValue)
-                nodeModifier = Node.Modifier(clipShape: clipShapeData)
+                nodeModifier = Node.Modifier(type: .clipShape, data: .clipShape(clipShapeData))
             }
+        }
+        
+        // 将新的修饰符添加到现有修饰符列表中
+        var modifiers = childNode.modifiers ?? []
+        if let nodeModifier = nodeModifier {
+            modifiers.append(nodeModifier)
         }
         
         return Node(
@@ -53,7 +59,7 @@ extension ModifiedContent: ViewConvertible {
             type: childNode.type,
             data: childNode.data,
             children: childNode.children,
-            modifier: nodeModifier
+            modifiers: modifiers
         )
     }
 }

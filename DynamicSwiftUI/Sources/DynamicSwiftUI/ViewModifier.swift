@@ -38,6 +38,11 @@ public enum Edge: String, Codable, Sendable {
         public static let horizontal = Set(rawValue: [.leading, .trailing])
         public static let vertical = Set(rawValue: [.top, .bottom])
         
+        public static let top = Set(rawValue: [.top])
+        public static let leading = Set(rawValue: [.leading])
+        public static let bottom = Set(rawValue: [.bottom])
+        public static let trailing = Set(rawValue: [.trailing])
+        
         public init(rawValue: [Edge]) {
             self.rawValue = rawValue
         }
@@ -46,6 +51,9 @@ public enum Edge: String, Codable, Sendable {
             if rawValue == Set.all.rawValue { return "all" }
             if rawValue == Set.horizontal.rawValue { return "horizontal" }
             if rawValue == Set.vertical.rawValue { return "vertical" }
+            if rawValue.count == 1, let edge = rawValue.first {
+                return edge.rawValue
+            }
             return rawValue.map { $0.rawValue }.joined(separator: ",")
         }
     }

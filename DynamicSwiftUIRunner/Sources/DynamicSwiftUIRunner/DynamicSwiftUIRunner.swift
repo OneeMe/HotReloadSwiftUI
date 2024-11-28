@@ -198,26 +198,39 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             AnyView(EmptyView())
         }
         
-        // 分别应用 frame 和 padding 修饰器
-        view
-            .modifier(FrameViewModifier(node: node))
-            .modifier(PaddingViewModifier(node: node))
-            .modifier(ClipShapeViewModifier(node: node))
+        // 按顺序应用所有修饰符
+        if let modifiers = node.modifiers {
+            modifiers.reduce(view) { currentView, modifier in
+                switch modifier.type {
+                case .frame:
+                    if case .frame(let frameData) = modifier.data {
+                        return AnyView(currentView.modifier(FrameViewModifier(frameData: frameData)))
+                    }
+                case .padding:
+                    if case .padding(let paddingData) = modifier.data {
+                        return AnyView(currentView.modifier(PaddingViewModifier(paddingData: paddingData)))
+                    }
+                case .clipShape:
+                    if case .clipShape(let clipShapeData) = modifier.data {
+                        return AnyView(currentView.modifier(ClipShapeViewModifier(clipShapeData: clipShapeData)))
+                    }
+                }
+                return currentView
+            }
+        } else {
+            view
+        }
     }
     
     private struct FrameViewModifier: ViewModifier {
-        let node: Node
+        let frameData: Node.FrameData
         
         func body(content: Content) -> some View {
-            if let frameData = node.modifier?.frame {
-                content.frame(
-                    width: frameData.width,
-                    height: frameData.height,
-                    alignment: parseAlignment(frameData.alignment)
-                )
-            } else {
-                content
-            }
+            content.frame(
+                width: frameData.width,
+                height: frameData.height,
+                alignment: parseAlignment(frameData.alignment)
+            )
         }
         
         private func parseAlignment(_ str: String?) -> SwiftUI.Alignment {
@@ -237,14 +250,10 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     }
     
     private struct PaddingViewModifier: ViewModifier {
-        let node: Node
+        let paddingData: Node.PaddingData
         
         func body(content: Content) -> some View {
-            if let paddingData = node.modifier?.padding {
-                content.padding(parseEdges(paddingData.edges), paddingData.length)
-            } else {
-                content
-            }
+            content.padding(parseEdges(paddingData.edges), paddingData.length)
         }
         
         private func parseEdges(_ str: String) -> SwiftUI.Edge.Set {
@@ -252,6 +261,10 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             case "horizontal": return .horizontal
             case "vertical": return .vertical
             case "all": return .all
+            case "top": return .top
+            case "leading": return .leading
+            case "bottom": return .bottom
+            case "trailing": return .trailing
             default:
                 let edges = str.split(separator: ",")
                 var result: SwiftUI.Edge.Set = []
@@ -270,21 +283,17 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     }
     
     private struct ClipShapeViewModifier: ViewModifier {
-        let node: Node
+        let clipShapeData: Node.ClipShapeData
         
         func body(content: Content) -> some View {
-            if let clipShapeData = node.modifier?.clipShape {
-                switch clipShapeData.shapeType {
-                case "circle":
-                    content.clipShape(Circle())
-                case "rectangle":
-                    content.clipShape(Rectangle())
-                case "capsule":
-                    content.clipShape(Capsule())
-                default:
-                    content
-                }
-            } else {
+            switch clipShapeData.shapeType {
+            case "circle":
+                content.clipShape(Circle())
+            case "rectangle":
+                content.clipShape(Rectangle())
+            case "capsule":
+                content.clipShape(Capsule())
+            default:
                 content
             }
         }

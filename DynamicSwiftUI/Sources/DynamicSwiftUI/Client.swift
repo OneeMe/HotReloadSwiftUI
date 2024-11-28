@@ -83,6 +83,8 @@ actor WebSocketClient {
         if !isConnected {
             setup()
         }
+
+        
         
         let transferMessage = TransferMessage.renderData(data)
         guard let jsonData = try? JSONEncoder().encode(transferMessage),
@@ -90,6 +92,7 @@ actor WebSocketClient {
         else {
             return
         }
+        print("will send renderData, data is \(jsonString)")
         
         let message = URLSessionWebSocketTask.Message.string(jsonString)
         do {
@@ -124,10 +127,8 @@ actor WebSocketClient {
 let webSocketClient = WebSocketClient()
 
 @MainActor func processView<V: View>(_ view: V) -> Node {
-    print("will process view \(type(of: view))")
     if let convertible = view as? ViewConvertible {
         let node = convertible.convertToNode()
-        print("node is \(node)")
         return node
     }
     return processView(view.body)

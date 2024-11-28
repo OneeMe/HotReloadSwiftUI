@@ -33,11 +33,11 @@ public struct LandmarkDetail: View {
             //        )))
             //        .frame(height: 300)
             
-//            landmark
-//                .image
-//                .clipShape(Circle())
-//                .offset(y: -130)
-//                .padding(.bottom, -130)
+           landmark
+               .image
+               .padding(.bottom, -130)
+               .clipShape(Circle())
+            //    .offset(y: -130)
             
             VStack(alignment: .leading) {
                 HStack {
