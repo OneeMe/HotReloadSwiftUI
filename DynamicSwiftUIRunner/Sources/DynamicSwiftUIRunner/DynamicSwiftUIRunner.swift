@@ -3,6 +3,7 @@
 import Combine
 import DynamicSwiftUITransferProtocol
 import Foundation
+import MapKit
 import SwiftUI
 
 class RenderState: ObservableObject {
@@ -72,7 +73,7 @@ public struct DynamicSwiftUIRunner: View {
     
     @ViewBuilder
     private func buildView(from node: Node) -> some View {
-        switch node.type {
+        let view = switch node.type {
         case .text:
             AnyView(Text(node.data["text"] ?? ""))
         case .button:
@@ -118,7 +119,7 @@ public struct DynamicSwiftUIRunner: View {
             } else {
                 AnyView(EmptyView())
             }
-        case .image:
+        case .image: {
             let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
                 Image(imageName)
             } else if let systemName = node.data["systemName"], !systemName.isEmpty {
@@ -141,11 +142,48 @@ public struct DynamicSwiftUIRunner: View {
                 }
             }()
             
-            AnyView(
+            return AnyView(
                 image
                     .imageScale(imageScale)
                     .foregroundStyle(foregroundStyle)
             )
+        }()
+        default:
+            AnyView(EmptyView())
+        }
+        
+        // 应用 frame 修饰
+        view.modifier(FrameModifier(node: node))
+    }
+    
+    private struct FrameModifier: ViewModifier {
+        let node: Node
+        
+        func body(content: Content) -> some View {
+            if let frameData = node.modifier?.frame {
+                content.frame(
+                    width: frameData.width,
+                    height: frameData.height,
+                    alignment: parseAlignment(frameData.alignment)
+                )
+            } else {
+                content
+            }
+        }
+        
+        private func parseAlignment(_ str: String?) -> SwiftUI.Alignment {
+            guard let str = str else { return .center }
+            switch str {
+            case "topLeading": return .topLeading
+            case "top": return .top
+            case "topTrailing": return .topTrailing
+            case "leading": return .leading
+            case "trailing": return .trailing
+            case "bottomLeading": return .bottomLeading
+            case "bottom": return .bottom
+            case "bottomTrailing": return .bottomTrailing
+            default: return .center
+            }
         }
     }
 }

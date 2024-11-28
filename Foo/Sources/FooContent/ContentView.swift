@@ -16,6 +16,7 @@ public struct ContentView: View {
     public var body: some View {
         VStack {
             Image("turtlerock")
+                .frame(width: 30, height: 30)
             Button("Button\(count)") {
                 count += 1
             }

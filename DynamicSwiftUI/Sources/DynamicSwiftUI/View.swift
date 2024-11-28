@@ -56,3 +56,21 @@ extension TupleView: ViewConvertible {
 protocol ViewConvertible {
     func convertToNode() -> Node
 }
+
+public extension View {
+    @inlinable
+    @MainActor func frame(
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
+        alignment: Alignment = .center
+    ) -> ModifiedContent<Self, FrameModifier> {
+        ModifiedContent(
+            content: self,
+            modifier: FrameModifier(
+                width: width,
+                height: height,
+                alignment: alignment
+            )
+        )
+    }
+}

@@ -23,16 +23,48 @@ public struct Node: Codable, Sendable {
         case image
     }
     
+    public struct Modifier: Codable, Sendable {
+        public var frame: FrameData?
+        
+        public init(frame: FrameData? = nil) {
+            self.frame = frame
+        }
+    }
+    
+    public struct FrameData: Codable, Sendable {
+        public let width: CGFloat?
+        public let height: CGFloat?
+        public let alignment: String?
+        
+        public init(
+            width: CGFloat? = nil,
+            height: CGFloat? = nil,
+            alignment: String? = nil
+        ) {
+            self.width = width
+            self.height = height
+            self.alignment = alignment
+        }
+    }
+    
     public let id: String
     public let type: NodeType
     public let data: [String: String]
     public let children: [Node]?
+    public let modifier: Modifier?
     
-    public init(id: String, type: NodeType, data: [String: String], children: [Node]? = nil) {
+    public init(
+        id: String,
+        type: NodeType,
+        data: [String: String],
+        children: [Node]? = nil,
+        modifier: Modifier? = nil
+    ) {
         self.id = id
         self.type = type
         self.data = data
         self.children = children
+        self.modifier = modifier
     }
 }
 
