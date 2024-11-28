@@ -1,13 +1,13 @@
 {
-  "originHash" : "54bb47f5122f590c085acb39033d71cd9b73a28bf5c147ad53513ed8141fe760",
+  "originHash" : "952cc1a3ec3aa6aa1b71c964a51a0b103b692442834e92891a78754f776381bd",
   "pins" : [
     {
-      "identity" : "swift-syntax",
+      "identity" : "lookinserver",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/swiftlang/swift-syntax.git",
+      "location" : "https://github.com/QMUI/LookinServer/",
       "state" : {
-        "revision" : "0687f71944021d616d34d922343dcef086855920",
-        "version" : "600.0.1"
+        "revision" : "e553d1b689d147817dc54ad5c28fcff71e860101",
+        "version" : "1.2.8"
       }
     },
     {
