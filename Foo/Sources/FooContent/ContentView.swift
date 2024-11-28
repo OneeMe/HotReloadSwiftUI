@@ -10,27 +10,27 @@ import MapKit
 #endif
 
 public struct LandmarkDetail: View {
-    @Environment(ModelData.self) var modelData
+//    @Environment(ModelData.self) var modelData
     var landmark: Landmark
 
-    var landmarkIndex: Int {
-        modelData.landmarks.firstIndex(where: { $0.id == landmark.id })!
-    }
+//    var landmarkIndex: Int {
+//        modelData.landmarks.firstIndex(where: { $0.id == landmark.id })!
+//    }
     
     public init(landmark: Landmark) {
         self.landmark = landmark
     }
 
     public var body: some View {
-        @Bindable var modelData = modelData
-
-        Map(position: .constant(.region(
-            MKCoordinateRegion(
-                center: landmark.locationCoordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-            )
-        )))
-        .frame(height: 300)
+//        @Bindable var modelData = modelData
+//
+//        Map(position: .constant(.region(
+//            MKCoordinateRegion(
+//                center: landmark.locationCoordinate,
+//                span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
+//            )
+//        )))
+//        .frame(height: 300)
 
         landmark.image.clipShape(Circle())
             .offset(y: -130)
@@ -39,14 +39,14 @@ public struct LandmarkDetail: View {
         VStack(alignment: .leading) {
             HStack {
                 Text(landmark.name)
-                    .font(.title)
+//                    .font(.title)
 
                 Button {
-                    modelData.landmarks[landmarkIndex].isFavorite.toggle()
+//                    modelData.landmarks[landmarkIndex].isFavorite.toggle()
                 } label: {
-                    Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
-                        .labelStyle(.iconOnly)
-                        .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
+//                    Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
+//                        .labelStyle(.iconOnly)
+//                        .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
                 }
             }
 
@@ -55,18 +55,18 @@ public struct LandmarkDetail: View {
 
                 Text(landmark.state)
             }
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
+//            .font(.subheadline)
+//            .foregroundStyle(.secondary)
 
             Divider()
 
             Text("About \(landmark.name)")
-                .font(.title2)
+//                .font(.title2)
             Text(landmark.description)
         }
         .padding()
-        .navigationTitle(landmark.name)
-        .navigationBarTitleDisplayMode(.inline)
+//        .navigationTitle(landmark.name)
+//        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
