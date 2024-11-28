@@ -15,10 +15,12 @@ public struct ContentView: View {
     
     public var body: some View {
         VStack {
-            Button("Button From Foo: count: \(count)") {
+            Spacer()
+            Button("Button\(count)") {
                 count += 1
             }
-            Button("Button From Foo: count: \(count)") {
+            Divider()
+            Button("Button \(count)") {
                 count += 1
             }
         }

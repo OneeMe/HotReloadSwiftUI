@@ -102,6 +102,14 @@ public struct DynamicSwiftUIRunner: View {
             } else {
                 AnyView(EmptyView())
             }
+        case .divider:
+            AnyView(Divider())
+        case .spacer:
+            if let minLengthStr = node.data["minLength"] {
+                AnyView(Spacer(minLength: CGFloat(Float(minLengthStr) ?? 0)))
+            } else {
+                AnyView(Spacer())
+            }
         case .tupleContainer:
             if let children = node.children {
                 AnyView(TupleView(children.map { child in

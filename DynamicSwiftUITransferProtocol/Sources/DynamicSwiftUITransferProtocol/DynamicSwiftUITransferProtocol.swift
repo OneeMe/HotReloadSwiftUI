@@ -18,6 +18,8 @@ public struct Node: Codable, Sendable {
         case hStack
         case button
         case tupleContainer
+        case divider
+        case spacer
     }
     
     public let id: String
