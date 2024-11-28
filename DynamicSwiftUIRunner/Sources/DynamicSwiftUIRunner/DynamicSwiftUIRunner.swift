@@ -118,6 +118,28 @@ public struct DynamicSwiftUIRunner: View {
             } else {
                 AnyView(EmptyView())
             }
+        case .image:
+            let image = Image(systemName: node.data["systemName"] ?? "")
+            let imageScale: Image.Scale = {
+                switch node.data["imageScale"] {
+                case "small": return .small
+                case "large": return .large
+                default: return .medium
+                }
+            }()
+            let foregroundStyle: some ShapeStyle = {
+                switch node.data["foregroundStyle"] {
+                case "tint": return Color.accentColor
+                case "secondary": return Color.secondary
+                default: return Color.primary
+                }
+            }()
+            
+            AnyView(
+                image
+                    .imageScale(imageScale)
+                    .foregroundStyle(foregroundStyle)
+            )
         }
     }
 }

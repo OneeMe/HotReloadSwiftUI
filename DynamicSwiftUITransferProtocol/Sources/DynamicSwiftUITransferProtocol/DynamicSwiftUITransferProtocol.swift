@@ -20,6 +20,7 @@ public struct Node: Codable, Sendable {
         case tupleContainer
         case divider
         case spacer
+        case image
     }
     
     public let id: String
