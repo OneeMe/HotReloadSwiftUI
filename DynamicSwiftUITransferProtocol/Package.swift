@@ -6,7 +6,7 @@ let package = Package(
     name: "DynamicSwiftUITransferProtocol",
     platforms: [
         .macOS(.v14),
-        .iOS(.v13)
+        .iOS(.v17)
     ],
     products: [
         .library(
