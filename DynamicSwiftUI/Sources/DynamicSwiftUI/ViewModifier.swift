@@ -80,3 +80,12 @@ public struct ClipShapeModifier<S: Shape>: ViewModifier {
         self.style = style
     }
 }
+
+@MainActor
+public struct LabelStyleModifier: ViewModifier {
+    let style: LabelStyle
+    
+    public init(_ style: LabelStyle) {
+        self.style = style
+    }
+}

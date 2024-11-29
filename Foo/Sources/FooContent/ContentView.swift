@@ -49,7 +49,7 @@ public struct LandmarkDetail: View {
 //                        // 不需要手动调用 sendModelUpdate
 //                    } label: {
                         Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
-//                            .labelStyle(.iconOnly)
+                           .labelStyle(.iconOnly)
 //                            .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
 //                    }
                 }

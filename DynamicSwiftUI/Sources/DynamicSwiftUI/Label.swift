@@ -30,11 +30,17 @@ public struct Label<Title: View, Icon: View>: View {
     }
 }
 
-public enum LabelStyle {
+public enum LabelStyle: String {
     case automatic
     case titleAndIcon
     case titleOnly
     case iconOnly
+}
+
+extension View {
+    public func labelStyle(_ style: LabelStyle) -> ModifiedContent<Self, LabelStyleModifier> {
+        ModifiedContent(content: self, modifier: LabelStyleModifier(style))
+    }
 }
 
 extension Label: ViewConvertible {
