@@ -30,6 +30,7 @@ public struct Node: Codable, Sendable {
             case padding
             case clipShape
             case labelStyle
+            case foregroundStyle
         }
         
         public enum ModifierData: Codable, Sendable {
@@ -37,6 +38,7 @@ public struct Node: Codable, Sendable {
             case padding(PaddingData)
             case clipShape(ClipShapeData)
             case labelStyle(LabelStyleData)
+            case foregroundStyle(ForegroundStyleData)
             
             private enum CodingKeys: String, CodingKey {
                 case type, data
@@ -57,6 +59,9 @@ public struct Node: Codable, Sendable {
                 case .labelStyle(let data):
                     try container.encode("labelStyle", forKey: .type)
                     try container.encode(data, forKey: .data)
+                case .foregroundStyle(let data):
+                    try container.encode("foregroundStyle", forKey: .type)
+                    try container.encode(data, forKey: .data)
                 }
             }
             
@@ -76,6 +81,9 @@ public struct Node: Codable, Sendable {
                 case "labelStyle":
                     let data = try container.decode(LabelStyleData.self, forKey: .data)
                     self = .labelStyle(data)
+                case "foregroundStyle":
+                    let data = try container.decode(ForegroundStyleData.self, forKey: .data)
+                    self = .foregroundStyle(data)
                 default:
                     throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unknown modifier type"))
                 }
@@ -133,6 +141,14 @@ public struct Node: Codable, Sendable {
         
         public init(style: String) {
             self.style = style
+        }
+    }
+    
+    public struct ForegroundStyleData: Codable, Sendable {
+        public let color: String
+        
+        public init(color: String) {
+            self.color = color
         }
     }
     

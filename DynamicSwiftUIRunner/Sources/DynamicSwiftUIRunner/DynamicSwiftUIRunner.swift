@@ -195,6 +195,17 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
                         .foregroundStyle(foregroundStyle)
                 )
             }()
+        case .foregroundStyle:
+            if case .foregroundStyle(let foregroundStyleData) = modifier.data {
+                let color: Color = {
+                    switch foregroundStyleData.color {
+                    case "yellow": return .yellow
+                    case "gray": return .gray
+                    default: return .primary
+                    }
+                }()
+                return AnyView(currentView.foregroundStyle(color))
+            }
         default:
             AnyView(EmptyView())
         }

@@ -98,4 +98,8 @@ public extension View {
             modifier: ClipShapeModifier(shape: shape, style: style)
         )
     }
+
+    func foregroundStyle(_ color: Color) -> ModifiedContent<Self, ForegroundStyleModifier> {
+        ModifiedContent(content: self, modifier: ForegroundStyleModifier(color))
+    }
 }

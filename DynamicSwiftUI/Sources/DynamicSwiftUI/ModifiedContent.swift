@@ -49,6 +49,9 @@ extension ModifiedContent: ViewConvertible {
                 let clipShapeData = Node.ClipShapeData(shapeType: shape.type.rawValue)
                 nodeModifier = Node.Modifier(type: .clipShape, data: .clipShape(clipShapeData))
             }
+        } else if let foregroundStyleModifier = modifier as? ForegroundStyleModifier {
+            let foregroundStyleData = Node.ForegroundStyleData(color: foregroundStyleModifier.color.rawValue)
+            nodeModifier = Node.Modifier(type: .foregroundStyle, data: .foregroundStyle(foregroundStyleData))
         }
         
         // 将新的修饰符添加到现有修饰符列表中

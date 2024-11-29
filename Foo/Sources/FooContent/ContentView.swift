@@ -50,7 +50,7 @@ public struct LandmarkDetail: View {
 //                    } label: {
                         Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
                            .labelStyle(.iconOnly)
-//                            .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
+                           .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
 //                    }
                 }
                 

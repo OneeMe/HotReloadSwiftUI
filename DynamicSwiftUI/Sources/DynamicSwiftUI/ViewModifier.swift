@@ -89,3 +89,12 @@ public struct LabelStyleModifier: ViewModifier {
         self.style = style
     }
 }
+
+@MainActor
+public struct ForegroundStyleModifier: ViewModifier {
+    let color: Color
+    
+    public init(_ color: Color) {
+        self.color = color
+    }
+}
