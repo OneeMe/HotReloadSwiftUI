@@ -12,13 +12,26 @@ class LocalServer {
     private let dataSubject = PassthroughSubject<String, Never>()
     private var sessions: Set<WebSocketSession> = []
     private let initialArg: any Codable
+    private let environmentContainer: EnvironmentContainer
     
     var dataPublisher: AnyPublisher<String, Never> {
         dataSubject.eraseToAnyPublisher()
     }
     
-    init(initialArg: any Codable) {
+    init(initialArg: any Codable, environment: (any Codable)?) {
         self.initialArg = initialArg
+        if let environment = environment,
+           let data = try? JSONEncoder().encode(environment) {
+            self.environmentContainer = EnvironmentContainer(
+                id: String(describing: type(of: environment)),
+                data: data
+            )
+        } else {
+            self.environmentContainer = EnvironmentContainer(
+                id: "",
+                data: Data()
+            )
+        }
         setupServer()
     }
     
@@ -32,8 +45,11 @@ class LocalServer {
                         switch transferMessage {
                         case .renderData(let renderData):
                             self?.dataSubject.send(text)
+                        case .environmentUpdate(let container):
+                            self?.sessions.forEach { session in
+                                session.writeText(text)
+                            }
                         case .interactiveData, .initialArg:
-                            // 服务端不需要处理这些消息类型
                             break
                         }
                     }
@@ -66,12 +82,13 @@ class LocalServer {
     
     private func sendInitialArg(to session: WebSocketSession) {
         do {
-            print("Preparing to send initial arg")
-            let jsonData = try JSONEncoder().encode(initialArg)
-            let transferMessage = TransferMessage.initialArg(jsonData)
+            let launchData = LaunchData(
+                arg: try JSONEncoder().encode(initialArg),
+                environment: environmentContainer
+            )
+            let transferMessage = TransferMessage.initialArg(try JSONEncoder().encode(launchData))
             if let messageData = try? JSONEncoder().encode(transferMessage),
                let jsonString = String(data: messageData, encoding: .utf8) {
-                print("Sending initial arg to client: \(jsonString)")
                 session.writeText(jsonString)
             }
         } catch {

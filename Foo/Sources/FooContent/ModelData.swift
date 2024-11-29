@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-public class ModelData {
+public class ModelData: Codable { // TODO: 目前实现方案需要让 Observable 额外支持 Codable
     public var landmarks: [Landmark] = []
 
     public init(landmarks: [Landmark]) {

@@ -8,7 +8,7 @@ import Foundation
 
 actor WebSocketClient {
     var isConnected = false
-    private var webSocket: URLSessionWebSocketTask?
+    var webSocket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
     private var continuations: [CheckedContinuation<Data, Error>] = []
     
@@ -43,8 +43,8 @@ actor WebSocketClient {
                         handleInteraction(interactiveData)
                     case .initialArg(let data):
                         receivedLaunchData(data)
-                    case .renderData:
-                        // 客户端不需要处理 renderData
+                    case .renderData, .environmentUpdate:
+                        // 客户端不需要处理 renderData/environmentUpdate
                         break
                     }
                 }

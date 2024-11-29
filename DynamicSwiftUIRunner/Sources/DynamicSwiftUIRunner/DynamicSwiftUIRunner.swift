@@ -35,7 +35,7 @@ class RenderState: ObservableObject {
                             DispatchQueue.main.async {
                                 self?.data = renderData
                             }
-                        case .initialArg, .interactiveData:
+                        case .initialArg, .interactiveData, .environmentUpdate(_):
                             // Runner 端不需要处理这些消息类型
                             break
                         }
@@ -66,13 +66,14 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     public init(
         id: String,
         arg: Arg,
+        environment: (any Codable)?,
         @ViewBuilder content: (_ arg: Arg) -> Inner
     ) {
         self.id = id
         self.arg = arg
         self.content = content(arg)
         #if DEBUG
-        let server = LocalServer(initialArg: arg)
+        let server = LocalServer(initialArg: arg, environment: environment)
         _state = StateObject(wrappedValue: RenderState(id: id, server: server))
         self.server = server
         #endif

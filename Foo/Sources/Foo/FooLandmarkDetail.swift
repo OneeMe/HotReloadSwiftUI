@@ -9,13 +9,14 @@ import FooContent
 
 public struct FooLandmarkDetail: View {
     let landmark: Landmark
+    @Environment(ModelData.self) var modelData
     
     public init(landmark: Landmark) {
         self.landmark = landmark
     }
     
     public var body: some View {
-        DynamicSwiftUIRunner(id: "Foo", arg: landmark) {  arg in
+        DynamicSwiftUIRunner(id: "Foo", arg: landmark, environment: modelData) { arg in
             LandmarkDetail(landmark: arg)
         }
     }

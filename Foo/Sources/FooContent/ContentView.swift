@@ -10,12 +10,12 @@ import SwiftUI
 #endif
 
 public struct LandmarkDetail: View {
-//    @Environment(ModelData.self) var modelData
+    @Environment(ModelData.self) var modelData
     var landmark: Landmark
 
-//    var landmarkIndex: Int {
-//        modelData.landmarks.firstIndex(where: { $0.id == landmark.id })!
-//    }
+    var landmarkIndex: Int {
+        modelData.landmarks.firstIndex(where: { $0.id == landmark.id })!
+    }
     
     public init(landmark: Landmark) {
         self.landmark = landmark
@@ -44,13 +44,14 @@ public struct LandmarkDetail: View {
                     Text(landmark.name)
                     //                    .font(.title)
                     
-                    //                Button {
-                    //                    modelData.landmarks[landmarkIndex].isFavorite.toggle()
-                    //                } label: {
-                    //                    Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
-                    //                        .labelStyle(.iconOnly)
-                    //                        .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
-                    //                }
+//                    Button {
+//                        modelData.landmarks[landmarkIndex].isFavorite.toggle()
+//                        // 不需要手动调用 sendModelUpdate
+//                    } label: {
+//                        Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
+//                            .labelStyle(.iconOnly)
+//                            .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
+//                    }
                 }
                 
                 HStack {
