@@ -70,9 +70,7 @@ actor WebSocketClient {
             Task { @MainActor in
                 if let button = InteractiveComponentRegistry.shared.getComponent(withId: data.id) {
                     if let button = button as? Button {
-                        Task { @MainActor in
-                            button.handleTap()
-                        }
+                        button.handleTap()
                     }
                 }
             }
@@ -84,8 +82,6 @@ actor WebSocketClient {
             setup()
         }
 
-        
-        
         let transferMessage = TransferMessage.renderData(data)
         guard let jsonData = try? JSONEncoder().encode(transferMessage),
               let jsonString = String(data: jsonData, encoding: .utf8)
