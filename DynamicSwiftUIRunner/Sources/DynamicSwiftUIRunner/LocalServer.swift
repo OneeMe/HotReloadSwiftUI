@@ -28,7 +28,6 @@ class LocalServer {
                 id: String(describing: type(of: environment)),
                 data: String(data: data, encoding: .utf8) ?? ""
             )
-            print("environment: \(self.environmentContainer.data)")
         } else {
             self.environmentContainer = EnvironmentContainer(
                 id: "",

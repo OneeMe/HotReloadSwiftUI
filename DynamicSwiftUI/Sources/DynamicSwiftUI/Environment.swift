@@ -22,16 +22,6 @@ public struct EnvironmentValues {
     
     mutating func getValue<T: Codable>(forType typeName: String) -> T? {
         if let cached = cache[typeName] as? T {
-            Task { @MainActor in
-            // TODO: 先 ugly 实现，每次获取都发送一次更新
-                if let jsonData = try? JSONEncoder().encode(cached),
-                   let jsonString = String(data: jsonData, encoding: .utf8) {
-                    let container = EnvironmentContainer(id: typeName, data: jsonString)
-                    Task {
-                        await webSocketClient.send(.environmentUpdate(container))
-                    }
-                }
-            }
             return cached
         }
         
@@ -43,24 +33,45 @@ public struct EnvironmentValues {
         do {
             if let data = jsonString.data(using: .utf8) {
                 let value = try decoder.decode(T.self, from: data)
-                // TODO: 这里的监听机制没有生效
-                let trackedValue = withObservationTracking {
-                    // 只访问第一层属性
-                    let mirror = Mirror(reflecting: value)
-                    for child in mirror.children {
-                        let _ = child.value
+                if let _ = value as? any Observation.Observable {
+                    
+                    // TODO: 这里的监听机制没有生效
+                    withObservationTracking {
+                        // 只访问第一层属性
+                        let mirror = Mirror(reflecting: value)
+                        for child in mirror.children {
+                            let _ = child.value
+                        }
+                        return value
+                    } onChange: {
+                        print("value changed")
                     }
-                    return value
-                } onChange: {
-                    print("value changed")
                 }
-                cache[typeName] = trackedValue
-                return trackedValue
+                cache[typeName] = value
+                return value
             }
         } catch {
             print("Failed to decode value for type: \(typeName), error: \(error)")
         }
         return nil
+    }
+
+    private func updateWebSocket(value: any Codable, typeName: String) {
+        Task { @MainActor in
+            // 发送环境值更新
+            if let jsonData = try? JSONEncoder().encode(value),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                let container = EnvironmentContainer(id: typeName, data: jsonString)
+                await webSocketClient.send(.environmentUpdate(container))
+            }
+                
+            // 发送渲染数据更新
+            let viewHierarchy = ViewHierarchyManager.shared.getCurrentViewHierarchy()
+            if !viewHierarchy.data.isEmpty {
+                let renderData = RenderData(tree: viewHierarchy)
+                await webSocketClient.send(.render(renderData))
+            }
+        }
     }
 }
 

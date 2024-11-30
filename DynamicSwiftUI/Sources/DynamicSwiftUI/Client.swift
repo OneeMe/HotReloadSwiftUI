@@ -7,7 +7,6 @@ import DynamicSwiftUITransferProtocol
 import Foundation
 
 actor WebSocketClient {
-    var isConnected = false
     var webSocket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
     private var continuations: [CheckedContinuation<LaunchData, Error>] = []
@@ -78,10 +77,6 @@ actor WebSocketClient {
     }
     
     func send(_ message: TransferMessage) async {
-        if !isConnected {
-            setup()
-        }
-        
         guard let jsonData = try? JSONEncoder().encode(message),
               let jsonString = String(data: jsonData, encoding: .utf8) else {
             return
@@ -96,9 +91,7 @@ actor WebSocketClient {
     }
     
     func waitForLaunchData() async throws -> LaunchData {
-        if !isConnected {
-            setup()
-        }
+        setup()
         print("wait for server's launch data")
         return try await withCheckedThrowingContinuation { continuation in
             continuations.append(continuation)

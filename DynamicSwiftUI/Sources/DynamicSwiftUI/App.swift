@@ -40,6 +40,7 @@ func runApp<Root: App>(_ app: Root) async throws {
         if let content = windowGroupMirror.children.first?.value {
             if let content = content as? any View {
                 // 普通视图直接处理
+                ViewHierarchyManager.shared.setCurrentView(content)
                 viewHierarchy = processView(content)
             } else if let presentedContent = content as? AnyPresentedWindowContent {
                 viewHierarchy = processParameterizedContent(presentedContent, launchData: launchData.arg)
@@ -82,8 +83,10 @@ private func processParameterizedContent(_ presentedContent: AnyPresentedWindowC
             // TODO: 更新参数
         }
     )
-    
-    return processView(presentedContent.content(binding))
+    let content = presentedContent.content(binding)
+    // TODO: 先放在这里吧
+    ViewHierarchyManager.shared.setCurrentView(content)
+    return processView(content)
 }
 
 public enum DynamicAppRegistry {

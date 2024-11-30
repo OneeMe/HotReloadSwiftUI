@@ -10,7 +10,7 @@ class RenderState<Env: Codable>: ObservableObject {
     @Published var data: RenderData?
     private var cancellables = Set<AnyCancellable>()
     
-    private var server: LocalServer?
+    var server: LocalServer?
     @MainActor private var environmentUpdater: ((Env) -> Void)?
     
     init(id: String, server: LocalServer, environmentUpdater: @escaping (Env) -> Void) {
@@ -89,8 +89,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
     let environmentUpdater: (Env) -> Void
     
     #if DEBUG
-    @StateObject private var state: RenderState<Env>
-    private let server: LocalServer
+    @StateObject var state: RenderState<Env>
     #endif
     
     @State private var gradientStart = UnitPoint(x: -1, y: 0.5)
@@ -109,13 +108,11 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
         self.environmentUpdater = environmentUpdater
         
         #if DEBUG
-        let server = LocalServer(initialArg: arg, environment: environment)
         _state = StateObject(wrappedValue: RenderState<Env>(
             id: id,
-            server: server,
+            server: LocalServer(initialArg: arg, environment: environment),
             environmentUpdater: environmentUpdater
         ))
-        self.server = server
         #endif
     }
     
@@ -200,7 +197,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
         return AnyView(
             Button(action: {
                 Task {
-                    await server.sendInteractiveData(
+                    await state.server?.sendInteractiveData(
                         InteractiveData(id: id, type: .tap)
                     )
                 }
