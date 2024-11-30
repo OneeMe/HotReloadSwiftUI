@@ -50,7 +50,7 @@ extension ModifiedContent: ViewConvertible {
                 nodeModifier = Node.Modifier(type: .clipShape, data: .clipShape(clipShapeData))
             }
         } else if let foregroundStyleModifier = modifier as? ForegroundStyleModifier {
-            let foregroundStyleData = Node.ForegroundStyleData(color: foregroundStyleModifier.color.rawValue)
+            let foregroundStyleData = Node.ForegroundStyleData(color: foregroundStyleModifier.style.rawValue)
             nodeModifier = Node.Modifier(type: .foregroundStyle, data: .foregroundStyle(foregroundStyleData))
         }
         

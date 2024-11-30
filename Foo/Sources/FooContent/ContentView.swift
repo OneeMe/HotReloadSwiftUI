@@ -23,7 +23,6 @@ public struct LandmarkDetail: View {
 
     public var body: some View {
         VStack {
-            //        @Bindable var modelData = modelData
             //
             //        Map(position: .constant(.region(
             //            MKCoordinateRegion(
@@ -59,7 +58,7 @@ public struct LandmarkDetail: View {
                     Text(landmark.state)
                 }
                 //            .font(.subheadline)
-                //            .foregroundStyle(.secondary)
+                            .foregroundStyle(.secondary)
                 
                 Divider()
                 
