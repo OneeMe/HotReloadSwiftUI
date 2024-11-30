@@ -59,14 +59,10 @@ func runApp<Root: App>(_ app: Root) async throws {
     await webSocketClient.send(renderData)
         
     print("Application started, entering run loop...")
-        
-    // 创建一个永不完成的 Task 来保持程序运行
+    
+    // 在非异步上下文中运行 RunLoop
     try await withUnsafeThrowingContinuation { (_: UnsafeContinuation<Void, Error>) in
-        DispatchQueue.main.async {
-            let timer = Timer(timeInterval: TimeInterval.infinity, repeats: true) { _ in }
-            RunLoop.current.add(timer, forMode: .common)
-            RunLoop.current.run()
-        }
+        RunLoop.main.run()
     }
 }
 
