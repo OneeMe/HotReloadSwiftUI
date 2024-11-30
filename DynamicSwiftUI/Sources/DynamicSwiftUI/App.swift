@@ -71,7 +71,7 @@ func runApp<Root: App>(_ app: Root) async throws {
 }
 
 @MainActor
-private func processParameterizedContent(_ presentedContent: AnyPresentedWindowContent, launchData: Data) -> Node {
+private func processParameterizedContent(_ presentedContent: AnyPresentedWindowContent, launchData: String) -> Node {
     let arg = try? {
         if !launchData.isEmpty {
             return try presentedContent.decode(from: launchData)

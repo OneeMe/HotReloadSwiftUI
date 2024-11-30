@@ -10,31 +10,28 @@ import DynamicSwiftUITransferProtocol
 @MainActor
 public struct EnvironmentValues {
     static var current = EnvironmentValues()
-    private var storage: [String: Data] = [:]
+    private var storage: [String: String] = [:]
     
-    mutating func setValue<T: Codable>(_ value: T, forType typeName: String) {
-        // 将值编码为 Data
-        let encoder = JSONEncoder()
-        let data = try? encoder.encode(value)
-        storage[typeName] = data
+    mutating func setValue(_ value: String, forType typeName: String) {
+        storage[typeName] = value
     }
     
     func getValue<T: Codable>(forType typeName: String) -> T? {
-        guard let data = storage[typeName] else {
+        guard let jsonString = storage[typeName] else {
             return nil
         }
-        let jsonString = String(data: data, encoding: .utf8)
-        print("get value for type: \(typeName), value is \(jsonString ?? "")")
-        // 将 Data 解码为具体类型
+        print("get value for type: \(typeName), value is \(jsonString)")
+        
+        // 将 String 解码为具体类型
         let decoder = JSONDecoder()
         do {
-            let result = try decoder.decode(T.self, from: data)
-            return result
-        }
-        catch {
+            if let data = jsonString.data(using: .utf8) {
+                return try decoder.decode(T.self, from: data)
+            }
+        } catch {
             print("Failed to decode value for type: \(typeName), error is \(error)")
-            return nil
         }
+        return nil
     }
 }
 
@@ -60,7 +57,7 @@ public struct Environment<Value: Codable>: DynamicProperty {
 
 // 添加环境值设置方法
 @MainActor
-public func setEnvironmentValue<T: Codable>(_ value: T, forType typeName: String) {
+public func setEnvironmentValue(_ value: String, forType typeName: String) {
     EnvironmentValues.current.setValue(value, forType: typeName)
 }
 
@@ -68,7 +65,8 @@ public func setEnvironmentValue<T: Codable>(_ value: T, forType typeName: String
 public extension View {
     func environment<T: Codable>(_ value: T) -> some View {
         Task { @MainActor in
-            setEnvironmentValue(value, forType: String(describing: T.self))
+            let string = try! JSONEncoder().encode(value).base64EncodedString()
+            setEnvironmentValue(string, forType: String(describing: T.self))
         }
         return self
     }

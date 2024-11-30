@@ -241,10 +241,10 @@ public enum TransferMessage: Codable, Sendable {
 }
 
 public struct LaunchData: Codable, Sendable {
-    public let arg: Data
+    public let arg: String
     public let environment: EnvironmentContainer
     
-    public init(arg: Data, environment: EnvironmentContainer) {
+    public init(arg: String, environment: EnvironmentContainer) {
         self.arg = arg
         self.environment = environment
     }
@@ -252,9 +252,9 @@ public struct LaunchData: Codable, Sendable {
 
 public struct EnvironmentContainer: Codable, Sendable {
     public let id: String
-    public let data: Data
+    public let data: String
     
-    public init(id: String, data: Data) {
+    public init(id: String, data: String) {
         self.id = id
         self.data = data
     }

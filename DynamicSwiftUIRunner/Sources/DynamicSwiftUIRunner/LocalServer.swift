@@ -24,15 +24,13 @@ class LocalServer {
            let data = try? JSONEncoder().encode(environment) {
             self.environmentContainer = EnvironmentContainer(
                 id: String(describing: type(of: environment)),
-                data: data
+                data: String(data: data, encoding: .utf8) ?? ""
             )
-
-            let jsonString = String(data: data, encoding: .utf8)
-            print("environment: \(jsonString ?? "")")
+            print("environment: \(self.environmentContainer.data)")
         } else {
             self.environmentContainer = EnvironmentContainer(
                 id: "",
-                data: Data()
+                data: ""
             )
         }
         setupServer()
@@ -85,8 +83,9 @@ class LocalServer {
     
     private func sendInitialArg(to session: WebSocketSession) {
         do {
+            let argData = try JSONEncoder().encode(initialArg)
             let launchData = LaunchData(
-                arg: try JSONEncoder().encode(initialArg),
+                arg: String(data: argData, encoding: .utf8) ?? "",
                 environment: environmentContainer
             )
             let transferMessage = TransferMessage.initialArg(launchData)

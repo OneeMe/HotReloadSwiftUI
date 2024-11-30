@@ -79,8 +79,8 @@ public class AnyPresentedWindowContent {
     private let _id: String
     private let _defaultValue: () -> Any
     private let _content: (Binding<Any?>) -> any View
-    private let _decode: (Data) throws -> Any
-    private let _encode: (Any) throws -> Data
+    private let _decode: (String) throws -> Any
+    private let _encode: (Any) throws -> String
     
     init<D: Codable & Hashable, Content: View>(_ content: PresentedWindowContent<D, Content>) {
         self._id = content.id
@@ -92,11 +92,16 @@ public class AnyPresentedWindowContent {
             )
             return content.content(typedBinding)
         }
-        self._decode = { data in
-            try JSONDecoder().decode(D.self, from: data)
+        self._decode = { jsonString in
+            if let data = jsonString.data(using: .utf8) {
+                return try JSONDecoder().decode(D.self, from: data)
+            }
+            throw NSError(domain: "AnyPresentedWindowContent", code: -1, 
+                userInfo: [NSLocalizedDescriptionKey: "Failed to convert string to data"])
         }
         self._encode = { value in
-            try JSONEncoder().encode(value as! D)
+            let data = try JSONEncoder().encode(value as! D)
+            return String(data: data, encoding: .utf8) ?? ""
         }
     }
     
@@ -110,11 +115,11 @@ public class AnyPresentedWindowContent {
         _content(binding)
     }
     
-    func decode(from data: Data) throws -> Any {
-        try _decode(data)
+    func decode(from jsonString: String) throws -> Any {
+        try _decode(jsonString)
     }
     
-    func encode(_ value: Any) throws -> Data {
+    func encode(_ value: Any) throws -> String {
         try _encode(value)
     }
 }
