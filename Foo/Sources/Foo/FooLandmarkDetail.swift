@@ -9,7 +9,7 @@ import FooContent
 
 public struct FooLandmarkDetail: View {
     let landmark: Landmark
-    @Environment(ModelData.self) var modelData
+    @EnvironmentObject var modelData: ModelData
     
     public init(landmark: Landmark) {
         self.landmark = landmark

@@ -9,7 +9,7 @@ import Foo
 import FooContent
 
 struct ContentView: View {
-    @Environment(ModelData.self) var modelData
+    @EnvironmentObject var modelData: ModelData
     @State private var showFavoritesOnly = false
 
     var filteredLandmarks: [Landmark] {

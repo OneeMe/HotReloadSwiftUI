@@ -14,7 +14,7 @@ public struct EnvironmentValues {
     static var current = EnvironmentValues()
     private var storage: [String: String] = [:]
     private var cache: [String: Any] = [:]
-    
+    private var cancellables: Set<AnyCancellable> = []
     mutating func setValue(_ value: String, forType typeName: String) {
         storage[typeName] = value
         cache.removeValue(forKey: typeName)
@@ -33,19 +33,12 @@ public struct EnvironmentValues {
         do {
             if let data = jsonString.data(using: .utf8) {
                 let value = try decoder.decode(T.self, from: data)
-                if let _ = value as? any Observation.Observable {
-                    
-                    // TODO: 这里的监听机制没有生效
-                    withObservationTracking {
-                        // 只访问第一层属性
-                        let mirror = Mirror(reflecting: value)
-                        for child in mirror.children {
-                            let _ = child.value
-                        }
-                        return value
-                    } onChange: {
-                        print("value changed")
+                if let observableValue = value as? any ObservableObject {
+                    let publisher = (observableValue as? any ObservableObject)?.objectWillChange as? ObservableObjectPublisher
+                    publisher?.sink { [self] _ in
+                        self.updateWebSocket(value: value, typeName: typeName)
                     }
+                    .store(in: &cancellables)
                 }
                 cache[typeName] = value
                 return value
@@ -109,5 +102,25 @@ public extension View {
             setEnvironmentValue(string, forType: String(describing: T.self))
         }
         return self
+    }
+}
+
+// 添加 EnvironmentObject 属性包装器
+@propertyWrapper
+public struct EnvironmentObject<ObjectType: ObservableObject & Codable>: DynamicProperty {
+    private let objectType: ObjectType.Type
+    
+    public var wrappedValue: ObjectType {
+        get {
+            let typeName = String(describing: objectType)
+            if let value = EnvironmentValues.current.getValue(forType: typeName) as ObjectType? {
+                return value
+            }
+            fatalError("No environment object of type \(typeName) found. A View.environmentObject(_:) modifier must be applied to a parent view.")
+        }
+    }
+    
+    public init() {
+        self.objectType = ObjectType.self
     }
 }
