@@ -16,7 +16,9 @@ public struct FooLandmarkDetail: View {
     }
     
     public var body: some View {
-        DynamicSwiftUIRunner(id: "Foo", arg: landmark, environment: modelData) { arg in
+        DynamicSwiftUIRunner(id: "Foo", arg: landmark, environment: modelData, environmentUpdater: { newValue in
+            modelData.landmarks = newValue.landmarks
+        }) { arg in
             LandmarkDetail(landmark: arg)
         }
     }

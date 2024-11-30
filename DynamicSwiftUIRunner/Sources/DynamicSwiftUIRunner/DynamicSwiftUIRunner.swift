@@ -11,9 +11,11 @@ class RenderState<Env: Codable>: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     
     private var server: LocalServer?
+    @MainActor private var environmentUpdater: ((Env) -> Void)?
     
-    init(id: String, server: LocalServer) {
+    init(id: String, server: LocalServer, environmentUpdater: @escaping (Env) -> Void) {
         self.server = server
+        self.environmentUpdater = environmentUpdater
         
         server.dataPublisher
             .sink { [weak self] jsonString in
@@ -60,20 +62,15 @@ class RenderState<Env: Codable>: ObservableObject {
     }
     
     private func handleEnvironmentUpdate(_ container: EnvironmentContainer) {
-        guard let environment = server?.environment as? Env,
-              let data = container.data.data(using: .utf8) else { return }
+        guard let data = container.data.data(using: .utf8) else { return }
         
         do {
             let decodedValue = try JSONDecoder().decode(Env.self, from: data)
-            let mirror = Mirror(reflecting: decodedValue)
-            for child in mirror.children {
-                if let propertyName = child.label {
-//                    (environment as AnyObject).setValue(child.value, forKey: propertyName)
-                    print("propertyName is \(propertyName), value is \(child.value)")
-                }
+            Task { @MainActor in
+                environmentUpdater?(decodedValue)
             }
         } catch {
-            print("Failed to update environment: \(error)")
+            print("更新环境值失败: \(error)")
         }
     }
     
@@ -89,6 +86,8 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
     let id: String
     let arg: Arg
     let content: Inner
+    let environmentUpdater: (Env) -> Void
+    
     #if DEBUG
     @StateObject private var state: RenderState<Env>
     private let server: LocalServer
@@ -101,14 +100,21 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
         id: String,
         arg: Arg,
         environment: Env?,
+        environmentUpdater: @escaping (Env) -> Void,
         @ViewBuilder content: (_ arg: Arg) -> Inner
     ) {
         self.id = id
         self.arg = arg
         self.content = content(arg)
+        self.environmentUpdater = environmentUpdater
+        
         #if DEBUG
         let server = LocalServer(initialArg: arg, environment: environment)
-        _state = StateObject(wrappedValue: RenderState<Env>(id: id, server: server))
+        _state = StateObject(wrappedValue: RenderState<Env>(
+            id: id,
+            server: server,
+            environmentUpdater: environmentUpdater
+        ))
         self.server = server
         #endif
     }
