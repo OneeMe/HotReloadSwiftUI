@@ -189,8 +189,8 @@ public struct InteractiveData: Codable, Sendable {
 
 public enum TransferMessage: Codable, Sendable {
     case initialArg(LaunchData)  // 初始化参数
-    case renderData(RenderData)  // 渲染数据
-    case interactiveData(InteractiveData)  // 交互数据
+    case render(RenderData)  // 渲染数据
+    case interactive(InteractiveData)  // 交互数据
     case environmentUpdate(EnvironmentContainer)  // 新增环境值更新消息类型
     
     private enum CodingKeys: String, CodingKey {
@@ -206,12 +206,12 @@ public enum TransferMessage: Codable, Sendable {
         case "initialArg":
             let data = try container.decode(LaunchData.self, forKey: .payload)
             self = .initialArg(data)
-        case "renderData":
+        case "render":
             let renderData = try container.decode(RenderData.self, forKey: .payload)
-            self = .renderData(renderData)
-        case "interactiveData":
+            self = .render(renderData)
+        case "interactive":
             let interactiveData = try container.decode(InteractiveData.self, forKey: .payload)
-            self = .interactiveData(interactiveData)
+            self = .interactive(interactiveData)
         case "environmentUpdate":
             let data = try container.decode(EnvironmentContainer.self, forKey: .payload)
             self = .environmentUpdate(data)
@@ -227,11 +227,11 @@ public enum TransferMessage: Codable, Sendable {
         case .initialArg(let data):
             try container.encode("initialArg", forKey: .type)
             try container.encode(data, forKey: .payload)
-        case .renderData(let renderData):
-            try container.encode("renderData", forKey: .type)
+        case .render(let renderData):
+            try container.encode("render", forKey: .type)
             try container.encode(renderData, forKey: .payload)
-        case .interactiveData(let interactiveData):
-            try container.encode("interactiveData", forKey: .type)
+        case .interactive(let interactiveData):
+            try container.encode("interactive", forKey: .type)
             try container.encode(interactiveData, forKey: .payload)
         case .environmentUpdate(let data):
             try container.encode("environmentUpdate", forKey: .type)

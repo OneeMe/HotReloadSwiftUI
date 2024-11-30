@@ -56,7 +56,7 @@ func runApp<Root: App>(_ app: Root) async throws {
     let renderData = RenderData(tree: viewHierarchy)
         
     // 发送初始渲染数据
-    await webSocketClient.send(renderData)
+    await webSocketClient.send(.render(renderData))
         
     print("Application started, entering run loop...")
     

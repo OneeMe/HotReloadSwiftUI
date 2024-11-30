@@ -12,6 +12,7 @@ class LocalServer {
     private let dataSubject = PassthroughSubject<String, Never>()
     private var sessions: Set<WebSocketSession> = []
     private let initialArg: any Codable
+    private(set) var environment: (any Codable)?
     private let environmentContainer: EnvironmentContainer
     
     var dataPublisher: AnyPublisher<String, Never> {
@@ -20,6 +21,7 @@ class LocalServer {
     
     init(initialArg: any Codable, environment: (any Codable)?) {
         self.initialArg = initialArg
+        self.environment = environment
         if let environment = environment,
            let data = try? JSONEncoder().encode(environment) {
             self.environmentContainer = EnvironmentContainer(
@@ -39,40 +41,35 @@ class LocalServer {
     private func setupServer() {
         server["/ws"] = websocket(
             text: { [weak self] _, text in
-                do {
-                    guard let data = text.data(using: .utf8) else { return }
-                    
-                    if let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data) {
-                        switch transferMessage {
-                        case .renderData(let renderData):
-                            self?.dataSubject.send(text)
-                        case .environmentUpdate(let container):
-                            self?.sessions.forEach { session in
-                                session.writeText(text)
-                            }
-                        case .interactiveData, .initialArg:
-                            break
-                        }
-                    }
-                } catch {
-                    print("Failed to parse WebSocket message: \(error)")
-                }
+                self?.dataSubject.send(text)
             },
             binary: { _, _ in
                 print("Received binary data")
             },
             connected: { [weak self] session in
-                print("WebSocket client connected")
-                self?.sessions.insert(session)
-                self?.sendInitialArg(to: session)
+                self?.handleClientConnected(session)
             },
             disconnected: { [weak self] session in
-                print("WebSocket client disconnected")
-                self?.sessions.remove(session)
-                self?.dataSubject.send("")
+                self?.handleClientDisconnected(session)
             }
         )
         
+        startServer()
+    }
+    
+    private func handleClientConnected(_ session: WebSocketSession) {
+        print("WebSocket client connected")
+        sessions.insert(session)
+        sendInitialArg(to: session)
+    }
+    
+    private func handleClientDisconnected(_ session: WebSocketSession) {
+        print("WebSocket client disconnected")
+        sessions.remove(session)
+        dataSubject.send("")
+    }
+    
+    private func startServer() {
         do {
             try server.start(8080)
             print("WebSocket server started successfully on ws://localhost:8080/ws")
@@ -99,7 +96,7 @@ class LocalServer {
     }
     
     func sendInteractiveData(_ data: InteractiveData) async {
-        let transferMessage = TransferMessage.interactiveData(data)
+        let transferMessage = TransferMessage.interactive(data)
         guard let jsonData = try? JSONEncoder().encode(transferMessage),
               let jsonString = String(data: jsonData, encoding: .utf8)
         else {

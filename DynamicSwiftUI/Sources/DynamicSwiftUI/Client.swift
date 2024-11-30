@@ -39,11 +39,11 @@ actor WebSocketClient {
                    let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data)
                 {
                     switch transferMessage {
-                    case .interactiveData(let interactiveData):
+                    case .interactive(let interactiveData):
                         handleInteraction(interactiveData)
                     case .initialArg(let launchData):
                         receivedLaunchData(launchData)
-                    case .renderData, .environmentUpdate:
+                    case .render(_), .environmentUpdate:
                         // 客户端不需要处理 renderData/environmentUpdate
                         break
                     }
@@ -77,22 +77,19 @@ actor WebSocketClient {
         }
     }
     
-    func send(_ data: RenderData) async {
+    func send(_ message: TransferMessage) async {
         if !isConnected {
             setup()
         }
-
-        let transferMessage = TransferMessage.renderData(data)
-        guard let jsonData = try? JSONEncoder().encode(transferMessage),
-              let jsonString = String(data: jsonData, encoding: .utf8)
-        else {
+        
+        guard let jsonData = try? JSONEncoder().encode(message),
+              let jsonString = String(data: jsonData, encoding: .utf8) else {
             return
         }
-        print("will send renderData, data is \(jsonString)")
         
-        let message = URLSessionWebSocketTask.Message.string(jsonString)
+        let wsMessage = URLSessionWebSocketTask.Message.string(jsonString)
         do {
-            try await webSocket?.send(message)
+            try await webSocket?.send(wsMessage)
         } catch {
             print("WebSocket send error: \(error)")
         }

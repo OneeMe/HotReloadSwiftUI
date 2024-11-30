@@ -6,7 +6,7 @@ import Foundation
 import MapKit
 import SwiftUI
 
-class RenderState: ObservableObject {
+class RenderState<Env: Codable>: ObservableObject {
     @Published var data: RenderData?
     private var cancellables = Set<AnyCancellable>()
     
@@ -18,45 +18,79 @@ class RenderState: ObservableObject {
         server.dataPublisher
             .sink { [weak self] jsonString in
                 if jsonString.isEmpty {
-                    DispatchQueue.main.async {
-                        self?.data = nil
-                        print("接收到空字符串，意味着断联，将数据置空")
-                    }
+                    self?.handleDisconnect()
+                    return
                 }
+                
                 do {
-                    guard let data = jsonString.data(using: .utf8) else {
-                        throw NSError(domain: "RenderState", code: -1,
-                                      userInfo: [NSLocalizedDescriptionKey: "无法将字符串转换为数据"])
-                    }
+                    guard let data = jsonString.data(using: .utf8) else { return }
                     
                     if let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data) {
-                        switch transferMessage {
-                        case .renderData(let renderData):
-                            DispatchQueue.main.async {
-                                self?.data = renderData
-                            }
-                        case .initialArg(_), .interactiveData, .environmentUpdate:
-                            // Runner 端不需要处理这些消息类型
-                            break
-                        }
+                        self?.handleTransferMessage(transferMessage)
                     }
                 } catch {
-                    DispatchQueue.main.async {
-                        self?.data = nil
-                        print("解码 JSON 失败: \(jsonString), 错误: \(error)")
-                    }
+                    self?.handleError(jsonString, error)
                 }
             }
             .store(in: &cancellables)
     }
+    
+    private func handleDisconnect() {
+        DispatchQueue.main.async {
+            self.data = nil
+            print("接收到空字符串，意味着断联，将数据置空")
+        }
+    }
+    
+    private func handleTransferMessage(_ message: TransferMessage) {
+        switch message {
+        case .render(let renderData):
+            handleRenderData(renderData)
+        case .environmentUpdate(let container):
+            handleEnvironmentUpdate(container)
+        case .initialArg(_), .interactive:
+            break
+        }
+    }
+    
+    private func handleRenderData(_ renderData: RenderData) {
+        DispatchQueue.main.async {
+            self.data = renderData
+        }
+    }
+    
+    private func handleEnvironmentUpdate(_ container: EnvironmentContainer) {
+        guard let environment = server?.environment as? Env,
+              let data = container.data.data(using: .utf8) else { return }
+        
+        do {
+            let decodedValue = try JSONDecoder().decode(Env.self, from: data)
+            let mirror = Mirror(reflecting: decodedValue)
+            for child in mirror.children {
+                if let propertyName = child.label {
+//                    (environment as AnyObject).setValue(child.value, forKey: propertyName)
+                    print("propertyName is \(propertyName), value is \(child.value)")
+                }
+            }
+        } catch {
+            print("Failed to update environment: \(error)")
+        }
+    }
+    
+    private func handleError(_ jsonString: String, _ error: Error) {
+        DispatchQueue.main.async {
+            self.data = nil
+            print("解码 JSON 失败: \(jsonString), 错误: \(error)")
+        }
+    }
 }
 
-public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
+public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: View {
     let id: String
     let arg: Arg
     let content: Inner
     #if DEBUG
-    @StateObject private var state: RenderState
+    @StateObject private var state: RenderState<Env>
     private let server: LocalServer
     #endif
     
@@ -66,7 +100,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     public init(
         id: String,
         arg: Arg,
-        environment: (any Codable)?,
+        environment: Env?,
         @ViewBuilder content: (_ arg: Arg) -> Inner
     ) {
         self.id = id
@@ -74,7 +108,7 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
         self.content = content(arg)
         #if DEBUG
         let server = LocalServer(initialArg: arg, environment: environment)
-        _state = StateObject(wrappedValue: RenderState(id: id, server: server))
+        _state = StateObject(wrappedValue: RenderState<Env>(id: id, server: server))
         self.server = server
         #endif
     }

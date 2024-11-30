@@ -13,13 +13,28 @@ import Observation
 public struct EnvironmentValues {
     static var current = EnvironmentValues()
     private var storage: [String: String] = [:]
-    private var observers: [String: (Any) -> Void] = [:]
+    private var cache: [String: Any] = [:]
     
     mutating func setValue(_ value: String, forType typeName: String) {
         storage[typeName] = value
+        cache.removeValue(forKey: typeName)
     }
     
-    func getValue<T: Codable>(forType typeName: String) -> T? {
+    mutating func getValue<T: Codable>(forType typeName: String) -> T? {
+        if let cached = cache[typeName] as? T {
+            Task { @MainActor in
+            // TODO: 先 ugly 实现，每次获取都发送一次更新
+                if let jsonData = try? JSONEncoder().encode(cached),
+                   let jsonString = String(data: jsonData, encoding: .utf8) {
+                    let container = EnvironmentContainer(id: typeName, data: jsonString)
+                    Task {
+                        await webSocketClient.send(.environmentUpdate(container))
+                    }
+                }
+            }
+            return cached
+        }
+        
         guard let jsonString = storage[typeName] else {
             return nil
         }
@@ -28,25 +43,24 @@ public struct EnvironmentValues {
         do {
             if let data = jsonString.data(using: .utf8) {
                 let value = try decoder.decode(T.self, from: data)
-                if let observable = value as? any Observable {
-                    withObservationTracking {
-                        if let observer = observers[typeName] {
-                            observer(value)
-                        }
-                    } onChange: {
-                        // 当值变化时会调用这个闭包
+                // TODO: 这里的监听机制没有生效
+                let trackedValue = withObservationTracking {
+                    // 只访问第一层属性
+                    let mirror = Mirror(reflecting: value)
+                    for child in mirror.children {
+                        let _ = child.value
                     }
+                    return value
+                } onChange: {
+                    print("value changed")
                 }
-                return value
+                cache[typeName] = trackedValue
+                return trackedValue
             }
         } catch {
-            print("Failed to decode value for type: \(typeName), error is \(error)")
+            print("Failed to decode value for type: \(typeName), error: \(error)")
         }
         return nil
-    }
-    
-    mutating func addObserver(forType typeName: String, observer: @escaping (Any) -> Void) {
-        observers[typeName] = observer
     }
 }
 
