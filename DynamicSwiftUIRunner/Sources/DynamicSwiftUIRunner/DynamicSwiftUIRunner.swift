@@ -195,17 +195,6 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
                         .foregroundStyle(foregroundStyle)
                 )
             }()
-        case .foregroundStyle:
-            if case .foregroundStyle(let foregroundStyleData) = modifier.data {
-                let color: Color = {
-                    switch foregroundStyleData.color {
-                    case "yellow": return .yellow
-                    case "gray": return .gray
-                    default: return .primary
-                    }
-                }()
-                return AnyView(currentView.foregroundStyle(color))
-            }
         default:
             AnyView(EmptyView())
         }
@@ -225,6 +214,14 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
                 case .clipShape:
                     if case .clipShape(let clipShapeData) = modifier.data {
                         return AnyView(currentView.modifier(ClipShapeViewModifier(clipShapeData: clipShapeData)))
+                    }
+                case .foregroundStyle:
+                    if case .foregroundStyle(let foregroundStyleData) = modifier.data {
+                        return AnyView(currentView.modifier(ForegroundStyleViewModifier(foregroundStyleData: foregroundStyleData)))
+                    }
+                case .labelStyle:
+                    if case .labelStyle(let labelStyleData) = modifier.data {
+                        return AnyView(currentView.modifier(LabelStyleViewModifier(labelStyleData: labelStyleData)))
                     }
                 }
                 return currentView
@@ -308,6 +305,44 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
             default:
                 content
             }
+        }
+    }
+    
+    private struct ForegroundStyleViewModifier: ViewModifier {
+        let foregroundStyleData: Node.ForegroundStyleData
+        
+        func body(content: Content) -> some View {
+            let color: SwiftUI.Color = {
+                switch foregroundStyleData.color {
+                case "yellow": return .yellow
+                case "gray": return .gray
+                case "primary": return .primary
+                case "secondary": return .secondary
+                case "tint": return .accentColor
+                default: return .primary
+                }
+            }()
+            content.foregroundStyle(color)
+        }
+    }
+    
+    private struct LabelStyleViewModifier: ViewModifier {
+        let labelStyleData: Node.LabelStyleData
+        
+        func body(content: Content) -> some View {
+            let style: any SwiftUI.LabelStyle = {
+                switch labelStyleData.style {
+                case "iconOnly":
+                    return .iconOnly
+                case "titleOnly":
+                    return .titleOnly
+                case "titleAndIcon":
+                    return .titleAndIcon
+                default:
+                    return .automatic
+                }
+            }()
+            AnyView(content.labelStyle(style))
         }
     }
     
