@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "swift: Build Debug FooApp (Foo)",
+			"type": "shell",
+			"command": "cd Foo && swift build --product FooApp",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
