@@ -98,3 +98,12 @@ public struct ForegroundStyleModifier: ViewModifier {
         self.style = style
     }
 }
+
+@MainActor
+public struct FontModifier: ViewModifier {
+    let font: Font
+    
+    public init(_ font: Font) {
+        self.font = font
+    }
+}

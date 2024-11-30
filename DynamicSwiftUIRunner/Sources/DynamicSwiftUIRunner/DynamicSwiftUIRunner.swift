@@ -321,6 +321,10 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
             if case .labelStyle(let labelStyleData) = modifier.data {
                 return AnyView(view.modifier(LabelStyleViewModifier(labelStyleData: labelStyleData)))
             }
+        case .font:
+            if case .font(let fontData) = modifier.data {
+                return AnyView(view.modifier(FontViewModifier(fontData: fontData)))
+            }
         }
         return view
     }
@@ -437,6 +441,23 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
                 }
             }()
             AnyView(content.labelStyle(style))
+        }
+    }
+    
+    private struct FontViewModifier: ViewModifier {
+        let fontData: Node.FontData
+        
+        func body(content: Content) -> some View {
+            let font: SwiftUI.Font = {
+                switch fontData.style {
+                case "title": return .title
+                case "title2": return .title2
+                case "subheadline": return .subheadline
+                case "body": return .body
+                default: return .body
+                }
+            }()
+            content.font(font)
         }
     }
     

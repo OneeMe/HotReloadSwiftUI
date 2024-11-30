@@ -32,24 +32,24 @@ public struct LandmarkDetail: View {
             //        )))
             //        .frame(height: 300)
             
-           landmark
-               .image
-               .padding(.bottom, -130)
-               .clipShape(Circle())
+            landmark
+                .image
+                .padding(.bottom, -130)
+                .clipShape(Circle())
             //    .offset(y: -130)
             
             VStack(alignment: .leading) {
                 HStack {
                     Text(landmark.name)
-                    //                    .font(.title)
+                        .font(.title)
                     
-                   Button {
-                       modelData.landmarks[landmarkIndex].isFavorite.toggle()
-                   } label: {
+                    Button {
+                        modelData.landmarks[landmarkIndex].isFavorite.toggle()
+                    } label: {
                         Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
-                           .labelStyle(.iconOnly)
-                           .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
-                   }
+                            .labelStyle(.iconOnly)
+                            .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
+                    }
                 }
                 
                 HStack {
@@ -57,19 +57,17 @@ public struct LandmarkDetail: View {
                     
                     Text(landmark.state)
                 }
-                //            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 
                 Divider()
                 
                 Text("About \(landmark.name)")
-                //                .font(.title2)
+                    .font(.title2)
                 Text(landmark.description)
             }
             .padding()
         }
-//        .navigationTitle(landmark.name)
-//        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
