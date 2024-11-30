@@ -26,6 +26,9 @@ class LocalServer {
                 id: String(describing: type(of: environment)),
                 data: data
             )
+
+            let jsonString = String(data: data, encoding: .utf8)
+            print("environment: \(jsonString ?? "")")
         } else {
             self.environmentContainer = EnvironmentContainer(
                 id: "",
@@ -86,7 +89,7 @@ class LocalServer {
                 arg: try JSONEncoder().encode(initialArg),
                 environment: environmentContainer
             )
-            let transferMessage = TransferMessage.initialArg(try JSONEncoder().encode(launchData))
+            let transferMessage = TransferMessage.initialArg(launchData)
             if let messageData = try? JSONEncoder().encode(transferMessage),
                let jsonString = String(data: messageData, encoding: .utf8) {
                 session.writeText(jsonString)

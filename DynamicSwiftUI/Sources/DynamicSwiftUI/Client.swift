@@ -10,7 +10,7 @@ actor WebSocketClient {
     var isConnected = false
     var webSocket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
-    private var continuations: [CheckedContinuation<Data, Error>] = []
+    private var continuations: [CheckedContinuation<LaunchData, Error>] = []
     
     func setup() {
         guard let url = URL(string: "ws://localhost:8080/ws") else { return }
@@ -41,8 +41,8 @@ actor WebSocketClient {
                     switch transferMessage {
                     case .interactiveData(let interactiveData):
                         handleInteraction(interactiveData)
-                    case .initialArg(let data):
-                        receivedLaunchData(data)
+                    case .initialArg(let launchData):
+                        receivedLaunchData(launchData)
                     case .renderData, .environmentUpdate:
                         // 客户端不需要处理 renderData/environmentUpdate
                         break
@@ -102,7 +102,7 @@ actor WebSocketClient {
         }
     }
     
-    func waitForLaunchData() async throws -> Data {
+    func waitForLaunchData() async throws -> LaunchData {
         if !isConnected {
             setup()
         }
@@ -112,10 +112,10 @@ actor WebSocketClient {
         }
     }
     
-    func receivedLaunchData(_ data: Data) {
+    func receivedLaunchData(_ launchData: LaunchData) {
         if let continuation = continuations.first {
             continuations.removeFirst()
-            continuation.resume(returning: data)
+            continuation.resume(returning: launchData)
         }
     }
     

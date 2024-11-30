@@ -35,7 +35,7 @@ class RenderState: ObservableObject {
                             DispatchQueue.main.async {
                                 self?.data = renderData
                             }
-                        case .initialArg, .interactiveData, .environmentUpdate(_):
+                        case .initialArg(_), .interactiveData, .environmentUpdate:
                             // Runner 端不需要处理这些消息类型
                             break
                         }

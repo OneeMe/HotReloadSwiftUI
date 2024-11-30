@@ -188,10 +188,10 @@ public struct InteractiveData: Codable, Sendable {
 }
 
 public enum TransferMessage: Codable, Sendable {
-    case initialArg(Data)  // 初始化参数
+    case initialArg(LaunchData)  // 初始化参数
     case renderData(RenderData)  // 渲染数据
     case interactiveData(InteractiveData)  // 交互数据
-    case environmentUpdate(Data)  // 新增环境值更新消息类型
+    case environmentUpdate(EnvironmentContainer)  // 新增环境值更新消息类型
     
     private enum CodingKeys: String, CodingKey {
         case type
@@ -204,7 +204,7 @@ public enum TransferMessage: Codable, Sendable {
         
         switch type {
         case "initialArg":
-            let data = try container.decode(Data.self, forKey: .payload)
+            let data = try container.decode(LaunchData.self, forKey: .payload)
             self = .initialArg(data)
         case "renderData":
             let renderData = try container.decode(RenderData.self, forKey: .payload)
@@ -213,7 +213,7 @@ public enum TransferMessage: Codable, Sendable {
             let interactiveData = try container.decode(InteractiveData.self, forKey: .payload)
             self = .interactiveData(interactiveData)
         case "environmentUpdate":
-            let data = try container.decode(Data.self, forKey: .payload)
+            let data = try container.decode(EnvironmentContainer.self, forKey: .payload)
             self = .environmentUpdate(data)
         default:
             throw DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "Unknown message type"))
@@ -240,7 +240,7 @@ public enum TransferMessage: Codable, Sendable {
     }
 }
 
-public struct LaunchData: Codable {
+public struct LaunchData: Codable, Sendable {
     public let arg: Data
     public let environment: EnvironmentContainer
     
@@ -250,7 +250,7 @@ public struct LaunchData: Codable {
     }
 }
 
-public struct EnvironmentContainer: Codable {
+public struct EnvironmentContainer: Codable, Sendable {
     public let id: String
     public let data: Data
     
