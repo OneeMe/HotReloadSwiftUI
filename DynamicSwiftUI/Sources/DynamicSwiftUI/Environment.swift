@@ -5,12 +5,15 @@
 
 import Foundation
 import DynamicSwiftUITransferProtocol
+import Combine
+import Observation
 
 // 定义环境值容器
 @MainActor
 public struct EnvironmentValues {
     static var current = EnvironmentValues()
     private var storage: [String: String] = [:]
+    private var observers: [String: (Any) -> Void] = [:]
     
     mutating func setValue(_ value: String, forType typeName: String) {
         storage[typeName] = value
@@ -20,18 +23,30 @@ public struct EnvironmentValues {
         guard let jsonString = storage[typeName] else {
             return nil
         }
-        print("get value for type: \(typeName), value is \(jsonString)")
         
-        // 将 String 解码为具体类型
         let decoder = JSONDecoder()
         do {
             if let data = jsonString.data(using: .utf8) {
-                return try decoder.decode(T.self, from: data)
+                let value = try decoder.decode(T.self, from: data)
+                if let observable = value as? any Observable {
+                    withObservationTracking {
+                        if let observer = observers[typeName] {
+                            observer(value)
+                        }
+                    } onChange: {
+                        // 当值变化时会调用这个闭包
+                    }
+                }
+                return value
             }
         } catch {
             print("Failed to decode value for type: \(typeName), error is \(error)")
         }
         return nil
+    }
+    
+    mutating func addObserver(forType typeName: String, observer: @escaping (Any) -> Void) {
+        observers[typeName] = observer
     }
 }
 
