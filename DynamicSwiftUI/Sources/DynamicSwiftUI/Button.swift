@@ -9,13 +9,20 @@ import DynamicSwiftUITransferProtocol
 @MainActor
 public struct Button: View {
     private let action: () -> Void
-    private let title: String
+    private let label: AnyView
     private let id: String
     
     public init(_ title: String, action: @escaping () -> Void) {
         self.id = UUID().uuidString
-        self.title = title
         self.action = action
+        self.label = AnyView(Text(title))
+        InteractiveComponentRegistry.shared.register(self, withId: id)
+    }
+    
+    public init(action: @escaping () -> Void, @ViewBuilder label: () -> any View) {
+        self.id = UUID().uuidString
+        self.action = action
+        self.label = AnyView(label())
         InteractiveComponentRegistry.shared.register(self, withId: id)
     }
     
@@ -25,8 +32,15 @@ public struct Button: View {
 }
 
 extension Button: ViewConvertible {
-    nonisolated func convertToNode() -> Node {
-        return Node(id: id,type: .button, data: ["title": title, "id": id])
+    @MainActor func convertToNode() -> Node {
+        // 将 label 转换为 Node
+        let labelNode = processView(label)
+        return Node(
+            id: id,
+            type: .button,
+            data: ["id": id],
+            children: [labelNode]  // 添加 label 作为子节点
+        )
     }
 }
 

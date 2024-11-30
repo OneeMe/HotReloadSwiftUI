@@ -122,113 +122,170 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable>: View {
     private func buildView(from node: Node) -> some View {
         let view = switch node.type {
         case .text:
-            AnyView(Text(node.data["text"] ?? ""))
+            buildTextView(from: node)
         case .button:
-            AnyView(Button(node.data["title"] ?? "") {
-                let interactiveData = InteractiveData(id: node.id, type: .tap)
-                Task {
-                    await server.sendInteractiveData(interactiveData)
-                }
-            })
+            buildButtonView(from: node)
         case .vStack:
-            if let children = node.children {
-                AnyView(VStack(alignment: parseHorizontalAlignment(node.data["alignment"]), spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
-                    ForEach(children, id: \.id) { child in
-                        buildView(from: child)
-                    }
-                })
-            } else {
-                AnyView(EmptyView())
-            }
+            buildVStackView(from: node)
         case .hStack:
-            if let children = node.children {
-                AnyView(HStack(alignment: parseVerticalAlignment(node.data["alignment"]), spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)) {
-                    ForEach(children, id: \.id) { child in
-                        buildView(from: child)
-                    }
-                })
-            } else {
-                AnyView(EmptyView())
-            }
+            buildHStackView(from: node)
         case .divider:
-            AnyView(Divider())
+            buildDividerView()
         case .spacer:
-            if let minLengthStr = node.data["minLength"] {
-                AnyView(Spacer(minLength: CGFloat(Float(minLengthStr) ?? 0)))
-            } else {
-                AnyView(Spacer())
-            }
+            buildSpacerView(from: node)
         case .tupleContainer:
-            if let children = node.children {
-                AnyView(TupleView(children.map { child in
-                    buildView(from: child)
-                }))
-            } else {
-                AnyView(EmptyView())
-            }
-        case .image: {
-                let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
-                    Image(imageName)
-                } else if let systemName = node.data["systemName"], !systemName.isEmpty {
-                    Image(systemName: systemName)
-                } else {
-                    Image(systemName: "questionmark")
-                }
-                let imageScale: Image.Scale = {
-                    switch node.data["imageScale"] {
-                    case "small": return .small
-                    case "large": return .large
-                    default: return .medium
-                    }
-                }()
-                let foregroundStyle: some ShapeStyle = {
-                    switch node.data["foregroundStyle"] {
-                    case "tint": return Color.accentColor
-                    case "secondary": return Color.secondary
-                    default: return Color.primary
-                    }
-                }()
-            
-                return AnyView(
-                    image
-                        .imageScale(imageScale)
-                        .foregroundStyle(foregroundStyle)
-                )
-            }()
+            buildTupleContainerView(from: node)
+        case .image:
+            buildImageView(from: node)
         default:
             AnyView(EmptyView())
         }
         
-        // 按顺序应用所有修饰符
+        // 应用修饰符
         if let modifiers = node.modifiers {
             modifiers.reduce(view) { currentView, modifier in
-                switch modifier.type {
-                case .frame:
-                    if case .frame(let frameData) = modifier.data {
-                        return AnyView(currentView.modifier(FrameViewModifier(frameData: frameData)))
-                    }
-                case .padding:
-                    if case .padding(let paddingData) = modifier.data {
-                        return AnyView(currentView.modifier(PaddingViewModifier(paddingData: paddingData)))
-                    }
-                case .clipShape:
-                    if case .clipShape(let clipShapeData) = modifier.data {
-                        return AnyView(currentView.modifier(ClipShapeViewModifier(clipShapeData: clipShapeData)))
-                    }
-                case .foregroundStyle:
-                    if case .foregroundStyle(let foregroundStyleData) = modifier.data {
-                        return AnyView(currentView.modifier(ForegroundStyleViewModifier(foregroundStyleData: foregroundStyleData)))
-                    }
-                case .labelStyle:
-                    if case .labelStyle(let labelStyleData) = modifier.data {
-                        return AnyView(currentView.modifier(LabelStyleViewModifier(labelStyleData: labelStyleData)))
-                    }
-                }
-                return currentView
+                applyModifier(currentView, modifier)
             }
         } else {
             view
         }
+    }
+    
+    private func buildTextView(from node: Node) -> AnyView {
+        AnyView(Text(node.data["text"] ?? ""))
+    }
+    
+    private func buildButtonView(from node: Node) -> AnyView {
+        let id = node.data["id"] ?? ""
+        return AnyView(
+            Button(action: {
+                Task {
+                    await server.sendInteractiveData(
+                        InteractiveData(id: id, type: .tap)
+                    )
+                }
+            }) {
+                if let child = node.children?.first {
+                    buildView(from: child)
+                } else {
+                    Text(node.data["title"] ?? "")
+                }
+            }
+        )
+    }
+    
+    private func buildVStackView(from node: Node) -> AnyView {
+        if let children = node.children {
+            AnyView(
+                VStack(
+                    alignment: parseHorizontalAlignment(node.data["alignment"]),
+                    spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)
+                ) {
+                    ForEach(children, id: \.id) { child in
+                        buildView(from: child)
+                    }
+                }
+            )
+        } else {
+            AnyView(EmptyView())
+        }
+    }
+    
+    private func buildHStackView(from node: Node) -> AnyView {
+        if let children = node.children {
+            AnyView(
+                HStack(
+                    alignment: parseVerticalAlignment(node.data["alignment"]),
+                    spacing: CGFloat(Float(node.data["spacing"] ?? "5") ?? 0)
+                ) {
+                    ForEach(children, id: \.id) { child in
+                        buildView(from: child)
+                    }
+                }
+            )
+        } else {
+            AnyView(EmptyView())
+        }
+    }
+    
+    private func buildDividerView() -> AnyView {
+        AnyView(Divider())
+    }
+    
+    private func buildSpacerView(from node: Node) -> AnyView {
+        if let minLengthStr = node.data["minLength"] {
+            AnyView(Spacer(minLength: CGFloat(Float(minLengthStr) ?? 0)))
+        } else {
+            AnyView(Spacer())
+        }
+    }
+    
+    private func buildTupleContainerView(from node: Node) -> AnyView {
+        if let children = node.children {
+            AnyView(TupleView(children.map { child in
+                buildView(from: child)
+            }))
+        } else {
+            AnyView(EmptyView())
+        }
+    }
+    
+    private func buildImageView(from node: Node) -> AnyView {
+        let image = if let imageName = node.data["imageName"], !imageName.isEmpty {
+            Image(imageName)
+        } else if let systemName = node.data["systemName"], !systemName.isEmpty {
+            Image(systemName: systemName)
+        } else {
+            Image(systemName: "questionmark")
+        }
+        
+        let imageScale: Image.Scale = {
+            switch node.data["imageScale"] {
+            case "small": return .small
+            case "large": return .large
+            default: return .medium
+            }
+        }()
+        
+        let foregroundStyle: some ShapeStyle = {
+            switch node.data["foregroundStyle"] {
+            case "tint": return Color.accentColor
+            case "secondary": return Color.secondary
+            default: return Color.primary
+            }
+        }()
+
+        return AnyView(
+            image
+                .imageScale(imageScale)
+                .foregroundStyle(foregroundStyle)
+        )
+    }
+    
+    private func applyModifier(_ view: AnyView, _ modifier: Node.Modifier) -> AnyView {
+        switch modifier.type {
+        case .frame:
+            if case .frame(let frameData) = modifier.data {
+                return AnyView(view.modifier(FrameViewModifier(frameData: frameData)))
+            }
+        case .padding:
+            if case .padding(let paddingData) = modifier.data {
+                return AnyView(view.modifier(PaddingViewModifier(paddingData: paddingData)))
+            }
+        case .clipShape:
+            if case .clipShape(let clipShapeData) = modifier.data {
+                return AnyView(view.modifier(ClipShapeViewModifier(clipShapeData: clipShapeData)))
+            }
+        case .foregroundStyle:
+            if case .foregroundStyle(let foregroundStyleData) = modifier.data {
+                return AnyView(view.modifier(ForegroundStyleViewModifier(foregroundStyleData: foregroundStyleData)))
+            }
+        case .labelStyle:
+            if case .labelStyle(let labelStyleData) = modifier.data {
+                return AnyView(view.modifier(LabelStyleViewModifier(labelStyleData: labelStyleData)))
+            }
+        }
+        return view
     }
     
     private struct FrameViewModifier: ViewModifier {

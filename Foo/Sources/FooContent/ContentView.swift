@@ -44,14 +44,13 @@ public struct LandmarkDetail: View {
                     Text(landmark.name)
                     //                    .font(.title)
                     
-//                    Button {
-//                        modelData.landmarks[landmarkIndex].isFavorite.toggle()
-//                        // 不需要手动调用 sendModelUpdate
-//                    } label: {
+                   Button {
+                       modelData.landmarks[landmarkIndex].isFavorite.toggle()
+                   } label: {
                         Label("Toggle Favorite", systemImage: modelData.landmarks[landmarkIndex].isFavorite ? "star.fill" : "star")
                            .labelStyle(.iconOnly)
                            .foregroundStyle(modelData.landmarks[landmarkIndex].isFavorite ? .yellow : .gray)
-//                    }
+                   }
                 }
                 
                 HStack {
