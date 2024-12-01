@@ -56,10 +56,15 @@ class LocalServer {
         
         startServer()
     }
+
+    public func close() {
+        sessions.removeAll()
+    }
     
     private func handleClientConnected(_ session: WebSocketSession) {
         print("WebSocket client connected")
         sessions.insert(session)
+        assert(sessions.count <= 1, "Multiple clients are not fully supported")
         sendInitialArg(to: session)
     }
     

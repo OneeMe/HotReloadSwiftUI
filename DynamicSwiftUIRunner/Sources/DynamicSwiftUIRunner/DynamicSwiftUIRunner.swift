@@ -153,6 +153,9 @@ public struct DynamicSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: Vie
                 }
             }
         }
+        .onDisappear {
+            state.server?.close()
+        }
     }
     
     @ViewBuilder
