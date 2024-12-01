@@ -6,13 +6,17 @@
 import DynamicSwiftUITransferProtocol
 import Foundation
 
+public struct ClientConfig {
+    nonisolated(unsafe) public static var address: String = "localhost"
+}
+
 actor WebSocketClient {
     var webSocket: URLSessionWebSocketTask?
     private let session = URLSession(configuration: .default)
     private var continuations: [CheckedContinuation<LaunchData, Error>] = []
     
     func setup() {
-        guard let url = URL(string: "ws://localhost:8080/ws") else { return }
+        guard let url = URL(string: "ws://\(ClientConfig.address):8080/ws") else { return }
         webSocket = session.webSocketTask(with: url)
         webSocket?.resume()
         receiveMessage()
