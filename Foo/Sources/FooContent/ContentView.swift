@@ -60,9 +60,3 @@ public struct LandmarkDetail: View {
         }
     }
 }
-
-#if !ENABLE_DYNAMIC_SWIFTUI
-#Preview {
-    LandmarkDetail(landmark: defaultLandMark)
-}
-#endif
