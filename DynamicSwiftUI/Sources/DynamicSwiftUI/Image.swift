@@ -11,8 +11,6 @@ public struct Image: View {
     let id: String = UUID().uuidString
     let imageName: String?
     let systemName: String?
-    var imageScale: ImageScale = .medium
-    var foregroundStyle: ForegroundStyle = .primary
     
     public init(systemName: String) {
         self.systemName = systemName
@@ -27,18 +25,6 @@ public struct Image: View {
     
     public var body: some View {
         self
-    }
-    
-    public func imageScale(_ scale: ImageScale) -> Image {
-        var copy = self
-        copy.imageScale = scale
-        return copy
-    }
-    
-    public func foregroundStyle(_ style: ForegroundStyle) -> Image {
-        var copy = self
-        copy.foregroundStyle = style
-        return copy
     }
 }
 
@@ -59,8 +45,6 @@ extension Image: ViewConvertible {
         let data: [String: String] = [
             "imageName": imageName ?? "",
             "systemName": systemName ?? "",
-            "imageScale": imageScale.rawValue,
-            "foregroundStyle": foregroundStyle.rawValue
         ]
         return Node(id: id, type: .image, data: data)
     }

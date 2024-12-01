@@ -59,7 +59,14 @@ protocol ViewConvertible {
 
 public extension View {
     @inlinable
-    @MainActor func frame(
+    @MainActor
+    func labelStyle(_ style: LabelStyle) -> ModifiedContent<Self, LabelStyleModifier> {
+        ModifiedContent(content: self, modifier: LabelStyleModifier(style))
+    }
+
+    @inlinable
+    @MainActor 
+    func frame(
         width: CGFloat? = nil,
         height: CGFloat? = nil,
         alignment: Alignment = .center

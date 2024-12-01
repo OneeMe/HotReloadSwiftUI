@@ -37,12 +37,6 @@ public enum LabelStyle: String {
     case iconOnly
 }
 
-extension View {
-    public func labelStyle(_ style: LabelStyle) -> ModifiedContent<Self, LabelStyleModifier> {
-        ModifiedContent(content: self, modifier: LabelStyleModifier(style))
-    }
-}
-
 extension Label: ViewConvertible {
     func convertToNode() -> Node {
         switch style {
