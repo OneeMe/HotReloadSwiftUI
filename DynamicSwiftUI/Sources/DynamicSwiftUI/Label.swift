@@ -38,6 +38,7 @@ public enum LabelStyle: String {
 }
 
 extension Label: ViewConvertible {
+    // Label 这里处理的比较特殊，本身是作为一个 shadow view 存在的。
     func convertToNode() -> Node {
         switch style {
         case .automatic, .titleAndIcon:
