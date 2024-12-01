@@ -40,6 +40,7 @@ class LocalServer {
     private func setupServer() {
         server["/ws"] = websocket(
             text: { [weak self] _, text in
+                print("received text: \(text)")
                 self?.dataSubject.send(text)
             },
             binary: { _, _ in

@@ -163,7 +163,7 @@ public struct Node: Codable, Sendable {
     public let type: NodeType
     public let data: [String: String]
     public let children: [Node]?
-    public let modifiers: [Modifier]?
+    public var modifiers: [Modifier]?
     
     public init(
         id: String,

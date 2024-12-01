@@ -34,7 +34,7 @@ public struct EnvironmentValues {
             if let data = jsonString.data(using: .utf8) {
                 let value = try decoder.decode(T.self, from: data)
                 if let observableValue = value as? any ObservableObject {
-                    let publisher = (observableValue as? any ObservableObject)?.objectWillChange as? ObservableObjectPublisher
+                    let publisher = observableValue.objectWillChange as? ObservableObjectPublisher
                     publisher?.sink { [self] _ in
                         self.updateWebSocket(value: value, typeName: typeName)
                     }

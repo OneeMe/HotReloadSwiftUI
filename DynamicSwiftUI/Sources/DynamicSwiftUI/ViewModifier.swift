@@ -72,14 +72,22 @@ public struct PaddingModifier: ViewModifier {
 
 @MainActor
 public struct ClipShapeModifier<S: Shape>: ViewModifier {
-    let shape: S
-    let style: FillStyle
+    public let shape: S
+    public let style: FillStyle
     
     public init(shape: S, style: FillStyle = FillStyle()) {
         self.shape = shape
         self.style = style
     }
 }
+
+public protocol AnyClipShapeModifier: ViewModifier {
+    associatedtype ShapeType: Shape
+    var shape: ShapeType { get }
+    var style: FillStyle { get }
+}
+
+extension ClipShapeModifier: AnyClipShapeModifier {}
 
 @MainActor
 public struct LabelStyleModifier: ViewModifier {

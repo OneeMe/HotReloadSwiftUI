@@ -99,6 +99,8 @@ public extension View {
         )
     }
 
+@inlinable
+    @MainActor
     func foregroundStyle(_ color: Color) -> ModifiedContent<Self, ForegroundStyleModifier> {
         ModifiedContent(content: self, modifier: ForegroundStyleModifier(color))
     }

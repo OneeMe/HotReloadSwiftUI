@@ -56,7 +56,7 @@ public enum ForegroundStyle: String {
 
 extension Image: ViewConvertible {
     func convertToNode() -> Node {
-        var data: [String: String] = [
+        let data: [String: String] = [
             "imageName": imageName ?? "",
             "systemName": systemName ?? "",
             "imageScale": imageScale.rawValue,

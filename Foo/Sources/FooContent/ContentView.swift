@@ -23,20 +23,10 @@ public struct LandmarkDetail: View {
 
     public var body: some View {
         VStack {
-            //
-            //        Map(position: .constant(.region(
-            //            MKCoordinateRegion(
-            //                center: landmark.locationCoordinate,
-            //                span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-            //            )
-            //        )))
-            //        .frame(height: 300)
-            
             landmark
                 .image
                 .padding(.bottom, -130)
                 .clipShape(Circle())
-            //    .offset(y: -130)
             
             VStack(alignment: .leading) {
                 HStack {
