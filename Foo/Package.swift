@@ -13,27 +13,27 @@ let package = Package(
         .library(name: "Foo", targets: ["Foo"]),
     ],
     dependencies: [
-        .package(name: "DynamicSwiftUI", path: "../DynamicSwiftUI"),
-        .package(name: "DynamicSwiftUIRunner", path: "../DynamicSwiftUIRunner"),
+        .package(name: "HotReloadSwiftUI", path: "../HotReloadSwiftUI"),
+        .package(name: "HotReloadSwiftUIRunner", path: "../HotReloadSwiftUIRunner"),
     ],
     targets: [
         .executableTarget(
             name: "FooApp",
-            dependencies: ["FooContent", "DynamicSwiftUI"],
+            dependencies: ["FooContent", "HotReloadSwiftUI"],
             swiftSettings: [
-                .define("ENABLE_DYNAMIC_SWIFTUI")
+                .define("ENABLE_DYNAMIC_SWIFTUI"),
             ]
         ),
         .target(
             name: "Foo",
-            dependencies: ["DynamicSwiftUIRunner", "FooContent"]
+            dependencies: ["HotReloadSwiftUIRunner", "FooContent"]
         ),
         .target(
             name: "FooContent",
-            dependencies: ["DynamicSwiftUI"],
+            dependencies: ["HotReloadSwiftUI"],
             swiftSettings: [
                 // TODO: 这种条件判断可能不是最好的，看看有没有更好的判断条件
-                .define("ENABLE_DYNAMIC_SWIFTUI", .when(platforms: [.macOS]))
+                .define("ENABLE_DYNAMIC_SWIFTUI", .when(platforms: [.macOS])),
             ]
         ),
     ]

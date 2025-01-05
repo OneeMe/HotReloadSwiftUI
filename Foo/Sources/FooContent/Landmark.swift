@@ -8,9 +8,9 @@
 import CoreLocation
 import Foundation
 #if ENABLE_DYNAMIC_SWIFTUI
-import DynamicSwiftUI
+    import HotReloadSwiftUI
 #else
-import SwiftUI
+    import SwiftUI
 #endif
 
 public struct Landmark: Hashable, Codable, Identifiable, Sendable {
@@ -39,7 +39,7 @@ public struct Landmark: Hashable, Codable, Identifiable, Sendable {
         var latitude: Double
         var longitude: Double
     }
-    
+
     init(id: Int, name: String, park: String, state: String, description: String, isFavorite: Bool, imageName: String, coordinates: Coordinates) {
         self.id = id
         self.name = name

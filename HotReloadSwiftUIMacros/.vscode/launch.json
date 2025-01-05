@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:HotReloadSwiftUIMacros}",
+      "name": "Debug HotReloadSwiftUIMacrosClient",
+      "program": "${workspaceFolder:HotReloadSwiftUIMacros}/.build/debug/HotReloadSwiftUIMacrosClient",
+      "preLaunchTask": "swift: Build Debug HotReloadSwiftUIMacrosClient"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:HotReloadSwiftUIMacros}",
+      "name": "Release HotReloadSwiftUIMacrosClient",
+      "program": "${workspaceFolder:HotReloadSwiftUIMacros}/.build/release/HotReloadSwiftUIMacrosClient",
+      "preLaunchTask": "swift: Build Release HotReloadSwiftUIMacrosClient"
+    }
+  ]
+}

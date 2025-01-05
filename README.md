@@ -1,4 +1,4 @@
-# DynamicSwiftUI
+# HotReloadSwiftUI
 
 A SwiftUI Toy which try to add Hot Reload to SwiftUI.
 
@@ -6,7 +6,7 @@ A SwiftUI Toy which try to add Hot Reload to SwiftUI.
 
 Use Xcode 15.0+ and open Two projects:
 
-- **Example**: A simple Host App which use DynamicSwiftUI to render Foo View
+- **Example**: A simple Host App which use HotReloadSwiftUI to render Foo View
 - **Foo**: A simple SwiftUI business module, you can also use `cd Foo && swift run` to run it.
 
 You should first run the Example. Then you can run the Foo project.
@@ -26,7 +26,7 @@ When you first run the Example project, you will see the basic UI:
 This UI is rendered by the native SwiftUI, the code is like this:
 
 ```swift
-import DynamicSwiftUIRunner
+import HotReloadSwiftUIRunner
 
 struct ContentView: View {
     var body: some View {
@@ -35,7 +35,7 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
-            DynamicSwiftUIRunner(id: "Foo")
+            HotReloadSwiftUIRunner(id: "Foo")
         }
         .padding()
     }
@@ -45,7 +45,7 @@ struct ContentView: View {
 After you run the Foo project, you will see the Button just the same like the button in Foo project:
 
 ```swift
-import DynamicSwiftUI
+import HotReloadSwiftUI
 
 struct ContentView: View {
     @State var count = 0
@@ -70,13 +70,13 @@ Then you can click the button to change the count:
 ## Architecture
 
 ```
-Example -> DynamicSwiftUIRunner -> SwiftUI(Maybe UIKit in the future)
+Example -> HotReloadSwiftUIRunner -> SwiftUI(Maybe UIKit in the future)
               /\ 
               |
               | WebSocket request
               |
               \/
-Foo -> DynamicSwiftUI
+Foo -> HotReloadSwiftUI
 ```
 
 ## Features

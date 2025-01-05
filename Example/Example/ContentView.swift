@@ -3,10 +3,10 @@
 // Created by: onee on 2024/11/24
 //
 
-import DynamicSwiftUIRunner
-import SwiftUI
 import Foo
 import FooContent
+import HotReloadSwiftUIRunner
+import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var modelData: ModelData
@@ -14,7 +14,7 @@ struct ContentView: View {
 
     var filteredLandmarks: [Landmark] {
         modelData.landmarks.filter { landmark in
-            (!showFavoritesOnly || landmark.isFavorite)
+            !showFavoritesOnly || landmark.isFavorite
         }
     }
 
