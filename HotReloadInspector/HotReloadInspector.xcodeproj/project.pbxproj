@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BDA70FD32D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = BDA70FD22D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol */; };
+		BDA70FFE2D2C088600AD55AE /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = BDA70FFD2D2C088600AD55AE /* Swifter */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BDA70DC12D2A33A500AD55AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +32,7 @@
 		BDA70DAD2D2A33A400AD55AE /* HotReloadInspector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HotReloadInspector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDA70DC02D2A33A500AD55AE /* HotReloadInspectorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotReloadInspectorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDA70DCA2D2A33A500AD55AE /* HotReloadInspectorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotReloadInspectorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BDA70FFB2D2C074C00AD55AE /* HotReloadSwiftUITransferProtocol */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HotReloadSwiftUITransferProtocol; path = ../HotReloadSwiftUITransferProtocol; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BDA70FD32D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol in Frameworks */,
+				BDA70FFE2D2C088600AD55AE /* Swifter in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,6 +83,7 @@
 		BDA70DA42D2A33A400AD55AE = {
 			isa = PBXGroup;
 			children = (
+				BDA70FFA2D2C073400AD55AE /* Packages */,
 				BDA70DAF2D2A33A400AD55AE /* HotReloadInspector */,
 				BDA70DC32D2A33A500AD55AE /* HotReloadInspectorTests */,
 				BDA70DCD2D2A33A500AD55AE /* HotReloadInspectorUITests */,
@@ -90,6 +99,14 @@
 				BDA70DCA2D2A33A500AD55AE /* HotReloadInspectorUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BDA70FFA2D2C073400AD55AE /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				BDA70FFB2D2C074C00AD55AE /* HotReloadSwiftUITransferProtocol */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -112,6 +129,8 @@
 			);
 			name = HotReloadInspector;
 			packageProductDependencies = (
+				BDA70FD22D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol */,
+				BDA70FFD2D2C088600AD55AE /* Swifter */,
 			);
 			productName = HotReloadInspector;
 			productReference = BDA70DAD2D2A33A400AD55AE /* HotReloadInspector.app */;
@@ -195,6 +214,9 @@
 			);
 			mainGroup = BDA70DA42D2A33A400AD55AE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BDA70FFC2D2C088600AD55AE /* XCRemoteSwiftPackageReference "swifter" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BDA70DAE2D2A33A400AD55AE /* Products */;
 			projectDirPath = "";
@@ -551,6 +573,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BDA70FFC2D2C088600AD55AE /* XCRemoteSwiftPackageReference "swifter" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/httpswift/swifter";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BDA70FD22D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HotReloadSwiftUITransferProtocol;
+		};
+		BDA70FFD2D2C088600AD55AE /* Swifter */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDA70FFC2D2C088600AD55AE /* XCRemoteSwiftPackageReference "swifter" */;
+			productName = Swifter;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BDA70DA52D2A33A400AD55AE /* Project object */;
 }
