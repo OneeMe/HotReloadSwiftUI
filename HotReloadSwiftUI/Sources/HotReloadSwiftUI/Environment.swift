@@ -56,14 +56,14 @@ public struct EnvironmentValues {
                let jsonString = String(data: jsonData, encoding: .utf8)
             {
                 let container = EnvironmentContainer(id: typeName, data: jsonString)
-                await webSocketClient.send(.environmentUpdate(container))
+                await database.send(.execute(.environmentUpdate(container)))
             }
 
             // 发送渲染数据更新
             let viewHierarchy = ViewHierarchyManager.shared.getCurrentViewHierarchy()
             if !viewHierarchy.data.isEmpty {
                 let renderData = RenderData(tree: viewHierarchy)
-                await webSocketClient.send(.render(renderData))
+                await database.send(.execute(.render(renderData)))
             }
         }
     }

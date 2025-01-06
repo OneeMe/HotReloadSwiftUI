@@ -13,11 +13,22 @@ public struct ClientUnitId: Codable, CustomStringConvertible {
         let dateFormatter = ISO8601DateFormatter()
         return "\(package)/\(unit)/\(dateFormatter.string(from: instanceDate))"
     }
+    
+    public init(package: String, unit: String, instanceDate: Date) {
+        self.package = package
+        self.unit = unit
+        self.instanceDate = instanceDate
+    }
 }
 
 public struct DatabaseUnitId: Codable {
     public let package: String
     public let units: Set<String>
+    
+    public init(package: String, units: Set<String>) {
+        self.package = package
+        self.units = units
+    }
 }
 
 public enum Role: Codable {
@@ -28,4 +39,9 @@ public enum Role: Codable {
 public struct RegisterTransferMessage: Codable {
     public let role: Role
     public let deviceInfo: String?
+    
+    public init(role: Role, deviceInfo: String?) {
+        self.role = role
+        self.deviceInfo = deviceInfo
+    }
 }
