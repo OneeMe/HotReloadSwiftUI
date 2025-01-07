@@ -25,7 +25,7 @@ public struct State<Value> {
                 StateManager.shared.setState(id: id, value: newValue)
                 let viewHierarchy = ViewHierarchyManager.shared.getCurrentViewHierarchy()
                 let renderData = RenderData(tree: viewHierarchy)
-                await webSocketClient.send(.render(renderData))
+                await database.send(.execute(.render(renderData)))
             }
         }
     }

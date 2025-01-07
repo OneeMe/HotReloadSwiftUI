@@ -14,14 +14,12 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/httpswift/swifter.git", .upToNextMajor(from: "1.5.0")),
         .package(path: "../HotReloadSwiftUITransferProtocol"),
     ],
     targets: [
         .target(
             name: "HotReloadSwiftUIRunner",
             dependencies: [
-                .product(name: "Swifter", package: "swifter"),
                 .product(name: "HotReloadSwiftUITransferProtocol", package: "HotReloadSwiftUITransferProtocol"),
             ]
         ),

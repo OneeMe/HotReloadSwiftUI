@@ -17,6 +17,7 @@ let package = Package(
         ),
     ],
     dependencies: [
+        
         .package(name: "HotReloadSwiftUIMacros", path: "../HotReloadSwiftUIMacros"),
         .package(name: "HotReloadSwiftUITransferProtocol", path: "../HotReloadSwiftUITransferProtocol"),
     ],

@@ -5,85 +5,97 @@ import Foundation
 import HotReloadSwiftUITransferProtocol
 import MapKit
 import SwiftUI
+#if canImport(UIKit)
+    import UIKit
+#endif
 
 class RenderState<Env: Codable>: ObservableObject {
     @Published var data: RenderData?
     private var cancellables = Set<AnyCancellable>()
 
-    var server: LocalServer?
+    fileprivate let clientSender: ClientSender
     @MainActor private var environmentUpdater: ((Env) -> Void)?
 
-    init(id _: String, server: LocalServer, environmentUpdater: @escaping (Env) -> Void) {
-        self.server = server
+    init(id: ClientUnitId, arg: any Codable, environment: (any Codable)?, environmentUpdater: @escaping (Env) -> Void) {
         self.environmentUpdater = environmentUpdater
 
-        server.dataPublisher
-            .sink { [weak self] jsonString in
-                if jsonString.isEmpty {
-                    self?.handleDisconnect()
-                    return
-                }
+        // 创建客户端
+        #if canImport(UIKit)
+            let deviceName = UIDevice.current.name
+        #else
+            let deviceName = Host.current().localizedName ?? "Unknown Device"
+        #endif
 
-                do {
-                    guard let data = jsonString.data(using: .utf8) else { return }
+        clientSender = ClientSender(
+            id: id,
+            name: deviceName
+        )
 
-                    if let transferMessage = try? JSONDecoder().decode(TransferMessage.self, from: data) {
-                        self?.handleTransferMessage(transferMessage)
-                    }
-                } catch {
-                    self?.handleError(jsonString, error)
+        // 发送初始化参数
+        if let argData = try? JSONEncoder().encode(arg),
+           let environment = environment,
+           let data = try? JSONEncoder().encode(environment)
+        {
+            let launchData = LaunchData(
+                arg: String(data: argData, encoding: .utf8) ?? "",
+                environment: EnvironmentContainer(
+                    id: String(describing: type(of: environment)),
+                    data: String(data: data, encoding: .utf8) ?? ""
+                )
+            )
+            Task { [weak self] in
+                try await self?.clientSender.connect()
+                try await self?.clientSender.sendInitialArg(launchData)
+            }
+        }
+
+        // 监听数据更新
+        clientSender.messagePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { @MainActor [weak self] message in
+                switch message {
+                case let .render(renderData):
+                    self?.data = renderData
+                case let .environmentUpdate(container):
+                    self?.handleEnvironmentUpdate(container)
+                case .initialArg:
+                    break
+                case .interactive:
+                    break
                 }
             }
             .store(in: &cancellables)
     }
 
-    private func handleDisconnect() {
-        DispatchQueue.main.async {
-            self.data = nil
-            print("接收到空字符串，意味着断联，将数据置空")
-        }
-    }
-
-    private func handleTransferMessage(_ message: TransferMessage) {
-        switch message {
-        case let .render(renderData):
-            handleRenderData(renderData)
-        case let .environmentUpdate(container):
-            handleEnvironmentUpdate(container)
-        case .initialArg(_), .interactive:
-            break
-        }
-    }
-
-    private func handleRenderData(_ renderData: RenderData) {
-        DispatchQueue.main.async {
-            self.data = renderData
-        }
-    }
-
+    @MainActor
     private func handleEnvironmentUpdate(_ container: EnvironmentContainer) {
         guard let data = container.data.data(using: .utf8) else { return }
 
         do {
             let decodedValue = try JSONDecoder().decode(Env.self, from: data)
-            Task { @MainActor in
-                environmentUpdater?(decodedValue)
-            }
+            self.updateEnvironment(decodedValue)
         } catch {
             print("更新环境值失败: \(error)")
         }
     }
 
-    private func handleError(_ jsonString: String, _ error: Error) {
-        DispatchQueue.main.async {
-            self.data = nil
-            print("解码 JSON 失败: \(jsonString), 错误: \(error)")
+    @MainActor
+    private func updateEnvironment(_ value: Env) {
+        environmentUpdater?(value)
+    }
+
+    deinit {
+        print("RenderState deinit")
+        Task { [clientSender] in
+            await clientSender.disconnect()
         }
+        cancellables.removeAll()
     }
 }
 
 public struct HotReloadSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: View {
-    let id: String
+    let package: String
+    let unit: String
     let arg: Arg
     let content: Inner
     let environmentUpdater: (Env) -> Void
@@ -96,21 +108,24 @@ public struct HotReloadSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: V
     @State private var gradientEnd = UnitPoint(x: 0, y: 0.5)
 
     public init(
-        id: String,
+        package: String,
+        unit: String,
         arg: Arg,
         environment: Env?,
         environmentUpdater: @escaping (Env) -> Void,
         @ViewBuilder content: (_ arg: Arg) -> Inner
     ) {
-        self.id = id
+        self.package = package
+        self.unit = unit
         self.arg = arg
         self.content = content(arg)
         self.environmentUpdater = environmentUpdater
 
         #if DEBUG
             _state = StateObject(wrappedValue: RenderState<Env>(
-                id: id,
-                server: LocalServer(initialArg: arg, environment: environment),
+                id: .init(package: package, unit: unit, instanceDate: Date()),
+                arg: arg,
+                environment: environment,
                 environmentUpdater: environmentUpdater
             ))
         #endif
@@ -152,9 +167,6 @@ public struct HotReloadSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: V
                     content
                 }
             }
-        }
-        .onDisappear {
-            state.server?.close()
         }
     }
 
@@ -200,7 +212,7 @@ public struct HotReloadSwiftUIRunner<Inner: View, Arg: Codable, Env: Codable>: V
         return AnyView(
             Button(action: {
                 Task {
-                    await state.server?.sendInteractiveData(
+                    try? await state.clientSender.sendInteractiveData(
                         InteractiveData(id: id, type: .tap)
                     )
                 }
