@@ -8,9 +8,17 @@ let package = Package(
     .iOS(.v17),
   ],
   dependencies: [
-    .package(path: "../HotReloadSwiftUIRunner"),
-    .package(path: "../HotReloadSwiftUITransferProtocol"),
-    .package(path: "../HotReloadSwiftUI"),
-    .package(path: "../HotReloadSwiftUIMacros"),
+    .package(path: "./HotReloadSwiftUIRunner"),
+    .package(path: "./HotReloadSwiftUITransferProtocol"),
+    .package(path: "./HotReloadSwiftUI"),
+    .package(path: "./HotReloadSwiftUIMacros"),
+  ],
+  targets: [
+    .target(
+      name: "HotReloadSwiftUITransferProtocol",
+      dependencies: [
+        .product(name: "HotReloadSwiftUITransferProtocol", package: "HotReloadSwiftUITransferProtocol"),
+      ]
+    ),
   ]
 )
