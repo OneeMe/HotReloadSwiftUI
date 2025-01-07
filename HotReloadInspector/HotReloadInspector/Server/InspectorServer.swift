@@ -205,7 +205,7 @@ class InspectorServer: ObservableObject {
                 print("Skip forwarding message from disconnected client")
                 matchedConnections = []
             }
-        } else if var database = databases.first(where: { $0.value.session === session })?.value {
+        } else if let database = databases.first(where: { $0.value.session === session })?.value {
             // 如果是数据库发来的消息，转发给所有连接到这个数据库的客户端
             matchedConnections = connections.values.filter {
                 $0.database.session === session && $0.status == .connected

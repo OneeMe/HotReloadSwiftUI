@@ -6,7 +6,9 @@ import Foundation
 import HotReloadSwiftUITransferProtocol
 import Swifter
 
-struct Database: Hashable, Identifiable {
+// 为了确保 lastEnvironmentUpdate 和 lastRenderData 使用不同的 reference
+// 都可以正确同步，我们需要将 Database 和 Client 都设置为 class 而不是 struct
+class Database: Hashable, Identifiable {
     static func == (lhs: Database, rhs: Database) -> Bool {
         lhs.id == rhs.id
     }
