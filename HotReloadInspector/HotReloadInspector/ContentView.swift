@@ -25,7 +25,7 @@ struct ConnectionRow: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(connection.deviceInfo)
+                Text("\(connection.deviceInfo) - \(connection.client.clientId)")
                     .font(.system(size: 16, weight: .medium))
             }
             Spacer()
