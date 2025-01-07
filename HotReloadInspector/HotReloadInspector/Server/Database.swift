@@ -6,28 +6,26 @@ import Foundation
 import HotReloadSwiftUITransferProtocol
 import Swifter
 
-struct Database: Identifiable, Hashable {
-    let databaseId: DatabaseUnitId
-    let session: WebSocketSession
-
-    var id: String {
-        databaseId.package
-    }
-
-    var name: String {
-        databaseId.package
-    }
-
+struct Database: Hashable, Identifiable {
     static func == (lhs: Database, rhs: Database) -> Bool {
-        lhs.databaseId.package == rhs.databaseId.package
+        lhs.id == rhs.id
     }
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(databaseId.package)
+        hasher.combine(id)
     }
 
-    init(id: DatabaseUnitId, session: WebSocketSession) {
-        databaseId = id
+    var id: String { databaseId.package }
+
+    let databaseId: DatabaseUnitId
+    let session: WebSocketSession
+    var lastRenderData: RenderData?
+    var lastEnvironmentUpdate: EnvironmentContainer?
+
+    init(databaseId: DatabaseUnitId, session: WebSocketSession) {
+        self.databaseId = databaseId
         self.session = session
+        lastRenderData = nil
+        lastEnvironmentUpdate = nil
     }
 }

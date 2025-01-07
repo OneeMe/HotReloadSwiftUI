@@ -37,6 +37,7 @@ actor DatabaseSender {
             role: role,
             deviceInfo: getDeviceModel() ?? "Unknown Device"
         )
+        print("send register message")
         try await send(.register(registerMessage))
 
         // 开始接收消息
@@ -56,8 +57,6 @@ actor DatabaseSender {
                     @unknown default:
                         break
                     }
-                    // 继续接收下一条消息
-                    await self?.receiveMessage()
                 case let .failure(error):
                     print("WebSocket receive error: \(error)")
                     // 5s 后尝试重新连接
@@ -123,7 +122,7 @@ actor DatabaseSender {
 
     func waitForLaunchData() async throws -> LaunchData {
         try await setup()
-        print("wait for server's launch data")
+        print("wait for client's launch data")
         return try await withCheckedThrowingContinuation { continuation in
             continuations.append(continuation)
         }

@@ -41,7 +41,7 @@ struct DatabaseRow: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(database.name)
+            Text(database.id)
                 .font(.system(size: 16, weight: .medium))
             Text("\(connections.count) clients")
                 .font(.system(size: 14))
@@ -76,7 +76,7 @@ struct ContentView: View {
                 List(databaseConnections[database.id] ?? []) { connection in
                     ConnectionRow(connection: connection)
                 }
-                .navigationTitle("\(database.name) Connected Status")
+                .navigationTitle("\(database.id) Connected Status")
                 .listStyle(.plain)
             } else {
                 Text("Select a database")

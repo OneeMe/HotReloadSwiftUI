@@ -25,6 +25,7 @@ func runApp<Root: App>(_ app: Root) async throws {
 
     // 获取启动参数
     let launchData = try await database.waitForLaunchData()
+    print("get launch data")
 
     // 设置环境值 - 直接使用环境容器中的数据
     setEnvironmentValue(
@@ -57,7 +58,7 @@ func runApp<Root: App>(_ app: Root) async throws {
     let renderData = RenderData(tree: viewHierarchy)
 
     // 发送初始渲染数据
-    let _ = try? await database.send(.execute(.render(renderData)))
+    _ = try? await database.send(.execute(.render(renderData)))
 
     print("Application started, entering run loop...")
 

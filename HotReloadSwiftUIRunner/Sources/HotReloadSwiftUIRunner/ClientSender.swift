@@ -32,6 +32,7 @@ class ClientSender {
             role: .client(id: id),
             deviceInfo: name
         )
+        print("send register message")
         try await send(.register(registerMessage))
 
         // 开始接收消息
@@ -44,10 +45,12 @@ class ClientSender {
     }
 
     func sendInitialArg(_ launchData: LaunchData) async throws {
+        print("发送初始化参数")
         try await send(.execute(.initialArg(launchData)))
     }
 
     func sendInteractiveData(_ data: InteractiveData) async throws {
+        print("发送交互数据")
         try await send(.execute(.interactive(data)))
     }
 
@@ -91,7 +94,7 @@ class ClientSender {
             print("Failed to decode message: \(text)")
             return
         }
-        self.handleMessage(message)
+        handleMessage(message)
     }
 
     private func handleMessage(_ message: TransferMessage) {

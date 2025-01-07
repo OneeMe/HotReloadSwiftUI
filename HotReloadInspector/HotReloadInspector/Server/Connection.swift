@@ -12,16 +12,22 @@ enum ConnectionStatus: Hashable {
     case disconnected
 }
 
-struct Connection: Identifiable {
+class Connection: Identifiable {
     let database: Database
     let client: Client
     var status: ConnectionStatus
 
     var id: String {
-        "\(database.id)_\(client.id)"
+        "\(database.databaseId)_\(client.clientId)"
     }
 
     var deviceInfo: String {
         client.name
+    }
+    
+    public init(database: Database, client: Client, status: ConnectionStatus) {
+        self.database = database
+        self.client = client
+        self.status = status
     }
 }
