@@ -17,9 +17,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        
+        .package(url: "https://github.com/OneeMe/HotReloadSwiftUITransferProtocol", branch: "main"),
         .package(name: "HotReloadSwiftUIMacros", path: "../HotReloadSwiftUIMacros"),
-        .package(name: "HotReloadSwiftUITransferProtocol", path: "../HotReloadSwiftUITransferProtocol"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

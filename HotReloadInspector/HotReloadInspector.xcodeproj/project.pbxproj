@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BDA70FD32D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = BDA70FD22D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol */; };
 		BDA70FFE2D2C088600AD55AE /* Swifter in Frameworks */ = {isa = PBXBuildFile; productRef = BDA70FFD2D2C088600AD55AE /* Swifter */; };
+		BDCEBE5D2D2D48B00038C7F2 /* HotReloadSwiftUITransferProtocol in Frameworks */ = {isa = PBXBuildFile; productRef = BDCEBE5C2D2D48B00038C7F2 /* HotReloadSwiftUITransferProtocol */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -32,7 +33,6 @@
 		BDA70DAD2D2A33A400AD55AE /* HotReloadInspector.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HotReloadInspector.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDA70DC02D2A33A500AD55AE /* HotReloadInspectorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotReloadInspectorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BDA70DCA2D2A33A500AD55AE /* HotReloadInspectorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotReloadInspectorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		BDA70FFB2D2C074C00AD55AE /* HotReloadSwiftUITransferProtocol */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = HotReloadSwiftUITransferProtocol; path = ../HotReloadSwiftUITransferProtocol; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -60,6 +60,7 @@
 			files = (
 				BDA70FD32D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol in Frameworks */,
 				BDA70FFE2D2C088600AD55AE /* Swifter in Frameworks */,
+				BDCEBE5D2D2D48B00038C7F2 /* HotReloadSwiftUITransferProtocol in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +84,6 @@
 		BDA70DA42D2A33A400AD55AE = {
 			isa = PBXGroup;
 			children = (
-				BDA70FFA2D2C073400AD55AE /* Packages */,
 				BDA70DAF2D2A33A400AD55AE /* HotReloadInspector */,
 				BDA70DC32D2A33A500AD55AE /* HotReloadInspectorTests */,
 				BDA70DCD2D2A33A500AD55AE /* HotReloadInspectorUITests */,
@@ -99,14 +99,6 @@
 				BDA70DCA2D2A33A500AD55AE /* HotReloadInspectorUITests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		BDA70FFA2D2C073400AD55AE /* Packages */ = {
-			isa = PBXGroup;
-			children = (
-				BDA70FFB2D2C074C00AD55AE /* HotReloadSwiftUITransferProtocol */,
-			);
-			path = Packages;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +123,7 @@
 			packageProductDependencies = (
 				BDA70FD22D2C070F00AD55AE /* HotReloadSwiftUITransferProtocol */,
 				BDA70FFD2D2C088600AD55AE /* Swifter */,
+				BDCEBE5C2D2D48B00038C7F2 /* HotReloadSwiftUITransferProtocol */,
 			);
 			productName = HotReloadInspector;
 			productReference = BDA70DAD2D2A33A400AD55AE /* HotReloadInspector.app */;
@@ -216,6 +209,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				BDA70FFC2D2C088600AD55AE /* XCRemoteSwiftPackageReference "swifter" */,
+				BDCEBE5B2D2D48B00038C7F2 /* XCRemoteSwiftPackageReference "HotReloadSwiftUITransferProtocol" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BDA70DAE2D2A33A400AD55AE /* Products */;
@@ -583,6 +577,14 @@
 				minimumVersion = 1.5.0;
 			};
 		};
+		BDCEBE5B2D2D48B00038C7F2 /* XCRemoteSwiftPackageReference "HotReloadSwiftUITransferProtocol" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OneeMe/HotReloadSwiftUITransferProtocol";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -594,6 +596,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = BDA70FFC2D2C088600AD55AE /* XCRemoteSwiftPackageReference "swifter" */;
 			productName = Swifter;
+		};
+		BDCEBE5C2D2D48B00038C7F2 /* HotReloadSwiftUITransferProtocol */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BDCEBE5B2D2D48B00038C7F2 /* XCRemoteSwiftPackageReference "HotReloadSwiftUITransferProtocol" */;
+			productName = HotReloadSwiftUITransferProtocol;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

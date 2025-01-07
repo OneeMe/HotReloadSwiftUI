@@ -14,7 +14,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "../HotReloadSwiftUITransferProtocol"),
+        .package(url: "https://github.com/OneeMe/HotReloadSwiftUITransferProtocol", branch: "main"),
     ],
     targets: [
         .target(

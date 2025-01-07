@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "hotreloadswiftuitransferprotocol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OneeMe/HotReloadSwiftUITransferProtocol",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f513b22a17f2f891db428706477bf811dde80b0a"
+      }
+    }
+  ],
+  "version" : 2
+}

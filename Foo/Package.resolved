@@ -1,0 +1,15 @@
+{
+  "originHash" : "9159d9369e3f6b5dad8a596bf52e5f293bb6056ee853d5b5d1c6fc306a851e0a",
+  "pins" : [
+    {
+      "identity" : "hotreloadswiftuitransferprotocol",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/OneeMe/HotReloadSwiftUITransferProtocol",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f513b22a17f2f891db428706477bf811dde80b0a"
+      }
+    }
+  ],
+  "version" : 3
+}
