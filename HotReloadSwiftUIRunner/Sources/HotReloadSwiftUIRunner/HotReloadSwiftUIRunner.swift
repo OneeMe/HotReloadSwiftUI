@@ -13,7 +13,7 @@ class RenderState<Env: Codable>: ObservableObject {
     @Published var data: RenderData?
     private var cancellables = Set<AnyCancellable>()
 
-    let clientSender: ClientSender
+    fileprivate let clientSender: ClientSender
     @MainActor private var environmentUpdater: ((Env) -> Void)?
 
     init(id: ClientUnitId, arg: any Codable, environment: (any Codable)?, environmentUpdater: @escaping (Env) -> Void) {
@@ -43,56 +43,53 @@ class RenderState<Env: Codable>: ObservableObject {
                     data: String(data: data, encoding: .utf8) ?? ""
                 )
             )
-            Task {
-                try await clientSender.connect()
-                try await clientSender.sendInitialArg(launchData)
+            Task { [weak self] in
+                try await self?.clientSender.connect()
+                try await self?.clientSender.sendInitialArg(launchData)
             }
         }
 
         // 监听数据更新
         clientSender.messagePublisher
-            .sink { [weak self] message in
-                self?.handleTransferMessage(message)
+            .receive(on: DispatchQueue.main)
+            .sink { @MainActor [weak self] message in
+                switch message {
+                case let .render(renderData):
+                    self?.data = renderData
+                case let .environmentUpdate(container):
+                    self?.handleEnvironmentUpdate(container)
+                case .initialArg:
+                    break
+                case .interactive:
+                    break
+                }
             }
             .store(in: &cancellables)
     }
 
-    private func handleTransferMessage(_ message: ExecuteTransferMessage) {
-        switch message {
-        case let .render(renderData):
-            handleRenderData(renderData)
-        case let .environmentUpdate(container):
-            handleEnvironmentUpdate(container)
-        case .initialArg:
-            break
-        case .interactive:
-            break
-        }
-    }
-
-    private func handleRenderData(_ renderData: RenderData) {
-        DispatchQueue.main.async {
-            self.data = renderData
-        }
-    }
-
+    @MainActor
     private func handleEnvironmentUpdate(_ container: EnvironmentContainer) {
         guard let data = container.data.data(using: .utf8) else { return }
 
         do {
             let decodedValue = try JSONDecoder().decode(Env.self, from: data)
-            Task { @MainActor in
-                environmentUpdater?(decodedValue)
-            }
+            self.updateEnvironment(decodedValue)
         } catch {
             print("更新环境值失败: \(error)")
         }
     }
 
+    @MainActor
+    private func updateEnvironment(_ value: Env) {
+        environmentUpdater?(value)
+    }
+
     deinit {
-        Task {
+        print("RenderState deinit")
+        Task { [clientSender] in
             await clientSender.disconnect()
         }
+        cancellables.removeAll()
     }
 }
 

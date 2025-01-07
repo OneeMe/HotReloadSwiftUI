@@ -20,7 +20,6 @@ class InspectorServer: ObservableObject {
     private func setupServer() {
         server["/ws"] = websocket(
             text: { [weak self] session, text in
-                print("received text: \(text)")
                 self?.handleWebSocketMessage(session: session, text: text)
             },
             binary: { _, _ in
@@ -97,12 +96,14 @@ class InspectorServer: ObservableObject {
     private func handleRegister(session: WebSocketSession, info: RegisterTransferMessage) {
         switch info.role {
         case let .database(id):
+            print("handle register from database: \(id)")
             Task { @MainActor in
                 let database = Database(id: id, session: session)
                 databases[id.package] = database
             }
 
         case let .client(id):
+            print("handle register from client: \(id)")
             let client = Client(id: id, name: info.deviceInfo ?? "Unknown Device", session: session)
             clients[id.package] = client
 
