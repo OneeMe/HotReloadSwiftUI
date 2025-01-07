@@ -8,6 +8,7 @@ class InspectorServer: ObservableObject {
     private let port: UInt16
 
     @Published var databases: [String: Database] = [:]
+
     @Published var connections: [String: Connection] = [:]
     private var clients: [String: Client] = [:]
 
@@ -56,18 +57,22 @@ class InspectorServer: ObservableObject {
         if let clientId = clients.first(where: { $0.value.session === session })?.key {
             clients.removeValue(forKey: clientId)
 
-            // 更新连接状态
-            if let connectionId = connections.first(where: { $0.value.client.session === session })?.key {
-                connections[connectionId]?.status = .disconnected
+            Task { @MainActor in
+                // 更新连接状态
+                if let connectionId = connections.first(where: { $0.value.client.session === session })?.key {
+                    connections[connectionId]?.status = .disconnected
+                }
             }
         }
 
-        // 找到并移除断开连接的数据库
-        if let databasePackage = databases.first(where: { $0.value.session === session })?.key {
-            databases.removeValue(forKey: databasePackage)
+        Task { @MainActor in
+            // 找到并移除断开连接的数据库
+            if let databasePackage = databases.first(where: { $0.value.session === session })?.key {
+                databases.removeValue(forKey: databasePackage)
 
-            // 移除相关的连接
-            connections = connections.filter { $0.value.database.databaseId.package != databasePackage }
+                // 移除相关的连接
+                connections = connections.filter { $0.value.database.databaseId.package != databasePackage }
+            }
         }
     }
 
@@ -82,15 +87,8 @@ class InspectorServer: ObservableObject {
         switch message {
         case let .register(info):
             handleRegister(session: session, info: info)
-        case let .execute(info):
-            switch info {
-            case let .initialArg(launchData):
-                handleInitialArg(session: session, launchData: launchData)
-            case let .interactive(data):
-                handleInteractive(session: session, data: data)
-            default:
-                break
-            }
+        case .execute:
+            forwardMessage(from: session, message: message)
         case .disconnected:
             handleDisconnected(session)
         }
@@ -108,9 +106,9 @@ class InspectorServer: ObservableObject {
             let client = Client(id: id, name: info.deviceInfo ?? "Unknown Device", session: session)
             clients[id.package] = client
 
-            // 如果存在对应的数据库，创建连接
-            if let database = databases[id.package] {
-                Task { @MainActor in
+            Task { @MainActor in
+                // 如果存在对应的数据库，创建连接
+                if let database = databases[id.package] {
                     let connection = Connection(
                         database: database,
                         client: client,
@@ -123,24 +121,40 @@ class InspectorServer: ObservableObject {
         }
     }
 
-    private func handleInitialArg(session: WebSocketSession, launchData: LaunchData) {
-        // 找到对应的连接并转发
+    private func forwardMessage(from session: WebSocketSession, message: TransferMessage) {
+        // 找到所有相关的连接
+        let matchedConnections: [Connection]
         if let connection = connections.first(where: { $0.value.client.session === session })?.value {
-            if let messageData = try? JSONEncoder().encode(TransferMessage.execute(.initialArg(launchData))),
-               let jsonString = String(data: messageData, encoding: .utf8)
-            {
-                connection.database.session.writeText(jsonString)
-            }
+            // 如果是客户端发来的消息，转发给对应的数据库
+            matchedConnections = [connection]
+        } else if let databasePackage = databases.first(where: { $0.value.session === session })?.key {
+            // 如果是数据库发来的消息，转发给所有连接到这个数据库的客户端
+            matchedConnections = connections.values.filter { $0.database.databaseId.package == databasePackage }
+        } else {
+            return
         }
-    }
 
-    private func handleInteractive(session: WebSocketSession, data: InteractiveData) {
-        // 找到对应的连接并转发
-        if let connection = connections.first(where: { $0.value.client.session === session })?.value {
-            if let messageData = try? JSONEncoder().encode(TransferMessage.execute(.interactive(data))),
-               let jsonString = String(data: messageData, encoding: .utf8)
-            {
-                connection.database.session.writeText(jsonString)
+        // 编码并发送消息
+        if let messageData = try? JSONEncoder().encode(message),
+           let jsonString = String(data: messageData, encoding: .utf8)
+        {
+            for connection in matchedConnections {
+                // 根据消息类型决定发送方向
+                switch message {
+                case let .execute(executeMessage):
+                    switch executeMessage {
+                    case .initialArg, .interactive:
+                        // 客户端发来的消息，转发给数据库
+                        print("forward message to database: \(connection.database.id)")
+                        connection.database.session.writeText(jsonString)
+                    case .render, .environmentUpdate:
+                        // 数据库发来的消息，转发给客户端
+                        print("forward message to client: \(connection.client.id)")
+                        connection.client.session.writeText(jsonString)
+                    }
+                default:
+                    break
+                }
             }
         }
     }

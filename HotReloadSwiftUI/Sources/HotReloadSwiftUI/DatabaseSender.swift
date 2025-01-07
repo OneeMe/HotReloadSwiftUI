@@ -60,7 +60,8 @@ actor DatabaseSender {
                     await self?.receiveMessage()
                 case let .failure(error):
                     print("WebSocket receive error: \(error)")
-                    // 尝试重新连接
+                    // 5s 后尝试重新连接
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
                     try? await self?.setup()
                 }
             }
@@ -165,6 +166,6 @@ func getDeviceModel() -> String {
         guard let value = element.value as? Int8, value != 0 else { return nil }
         return String(UnicodeScalar(UInt8(value)))
     }.joined()
-    
+
     return identifier
 }
